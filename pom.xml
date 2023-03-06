@@ -62,7 +62,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
@@ -252,7 +251,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>restruts-beam</module>
+        <module>soya-framework-core</module>
     </modules>
 
 </project>
