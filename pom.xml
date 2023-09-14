@@ -253,6 +253,7 @@
     <modules>
         <module>soya-framework-core</module>
         <module>soya-framework-action</module>
+        <module>soya-framework-starter</module>
         <module>soya-framework-boot</module>
     </modules>
 
