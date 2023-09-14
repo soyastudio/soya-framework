@@ -1,3 +1,5 @@
+build/
+lib/*.jar
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -9,3 +11,17 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+.idea
+.idea_modules
+.settings
+.cache
+atlassian-ide-plugin.xml
+*.iml
+.java-version
+.zip
+.tgz
+.gz
+sonar-project.properties
+test-output/
+
+
