@@ -3,7 +3,6 @@ package soya.framework.springboot.starter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -12,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import soya.framework.container.Container;
-import soya.framework.container.ServiceLocateException;
-import soya.framework.container.ServiceLocator;
-import soya.framework.container.ServiceLocatorSingleton;
+import soya.framework.context.Container;
+import soya.framework.context.ServiceLocateException;
+import soya.framework.context.ServiceLocator;
+import soya.framework.context.ServiceLocatorSingleton;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -35,9 +34,6 @@ public class SoyaFrameworkAutoConfiguration {
 
     @PostConstruct
     void initialize() {
-
-        //System.out.println("+++++++++++++++++++++++ " + ServiceLocatorSingleton.getInstance());
-
         ClassPathScanningCandidateComponentProvider provider =
                 new ClassPathScanningCandidateComponentProvider(false);
 
