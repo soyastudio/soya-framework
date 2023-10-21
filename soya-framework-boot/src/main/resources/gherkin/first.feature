@@ -5,6 +5,26 @@ Feature: Guess the word
   abc
   xyz
 
+  # The background example
+  Background:
+    Given a global administrator named "Greg"
+    # @tag=http://www.google.com/method?a=<b>
+    And a blog named "Greg's anti-tax rants"
+    And a customer named "Dr. Bill"
+    And a blog named "Expensive Therapy" owned by "Dr. Bill"
+
+  # The Scenario Outline example
+  Scenario Outline: eating
+    Given there are <start> cucumbers
+    When I eat <eat> cucumbers
+    Then I should have <left> cucumbers
+
+    # Examples:
+    Examples:
+      | start | eat | left |
+      |    12 |   5 |    7 |
+      |    20 |   5 |   15 |
+
   # The first example has two steps
   Scenario: Maker starts a game
     # @tag=http://www.google.com/method?a=<b>
@@ -18,13 +38,3 @@ Feature: Guess the word
     And given
     When the Breaker joins the Maker's game
     Then the Breaker must guess a word with 5 characters
-
-  Scenario Outline: eating
-    Given there are <start> cucumbers
-    When I eat <eat> cucumbers
-    Then I should have <left> cucumbers
-
-    Examples:
-      | start | eat | left |
-      |    12 |   5 |    7 |
-      |    20 |   5 |   15 |

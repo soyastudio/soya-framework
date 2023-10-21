@@ -8,33 +8,17 @@ public class StepDefinition extends GherkinSyntaxNode {
         super(statement, comments);
     }
 
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        comments.forEach(c -> {
-            builder.append(INDENT).append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append(c)
-                    .append("\n");
-        });
-
-        annotations.entrySet().forEach(e -> {
-
-            builder.append(INDENT).append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append("@")
-                    .append(e.getKey())
-                    .append("=")
-                    .append(e.getValue())
-                    .append("\n");
-        });
-
-        builder.append(INDENT).append(INDENT)
+    public void append(StringBuilder builder, int indent) {
+        appendComments(builder, indent);
+        builder.append(INDENTS[indent])
                 .append(AND)
                 .append(statement)
                 .append("\n");
+    }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        append(builder, 2);
         return builder.toString();
     }
 }

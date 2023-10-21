@@ -25,6 +25,9 @@ public abstract class FeatureVisitor<T> implements GherkinKeywords {
                     ln = ln.substring(FEATURE.length()).trim();
                     visitFeature(ln);
 
+                } else if (ln.equals(BACKGROUND)) {
+                    visitBackground();
+
                 } else if (ln.startsWith(SCENARIO)) {
                     ln = ln.substring(SCENARIO.length()).trim();
                     visitScenario(ln);
@@ -45,9 +48,14 @@ public abstract class FeatureVisitor<T> implements GherkinKeywords {
                     ln = ln.substring(AND.length()).trim();
                     visitAnd(ln);
 
-                } else if (ln.startsWith(EXAMPLE)) {
-                    ln = ln.substring(EXAMPLE.length()).trim();
-                    visitAnd(ln);
+                } else if (ln.startsWith(SCENARIO_OUTLINE)) {
+                    visitScenarioOutline(ln);
+
+                } else if (ln.startsWith(EXAMPLES)) {
+                    visitExamples();
+
+                } else if (ln.startsWith(TABLE_SEPARATOR) && ln.endsWith(TABLE_SEPARATOR)) {
+                    visitDataLine(ln);
 
                 } else {
                     visitTextLine(line);
@@ -64,6 +72,10 @@ public abstract class FeatureVisitor<T> implements GherkinKeywords {
 
     protected abstract void visitFeature(String line);
 
+    protected abstract void visitBackground();
+
+    protected abstract void visitScenarioOutline(String line);
+
     protected abstract void visitScenario(String line);
 
     protected abstract void visitGiven(String line);
@@ -76,7 +88,9 @@ public abstract class FeatureVisitor<T> implements GherkinKeywords {
 
     protected abstract void visitExample(String line);
 
-    protected abstract void visitExamples(String line);
+    protected abstract void visitExamples();
+
+    protected abstract void visitDataLine(String line);
 
     protected abstract void visitTextLine(String line);
 

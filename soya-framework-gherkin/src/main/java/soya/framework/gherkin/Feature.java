@@ -1,10 +1,16 @@
 package soya.framework.gherkin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Feature extends GherkinSyntaxNode {
     private String name;
     private List<String> descriptions = new ArrayList<>();
+
+    private Background background;
+
     private Map<String, Scenario> scenarios = new LinkedHashMap<>();
 
     protected Feature(String statement, List<String> comments) {
@@ -23,32 +29,23 @@ public class Feature extends GherkinSyntaxNode {
     public String toString() {
 
         StringBuilder builder = new StringBuilder();
-        comments.forEach(c -> {
-            builder.append(COMMENT)
-                    .append(" ")
-                    .append(c)
-                    .append("\n");
-        });
-
-        annotations.entrySet().forEach(e -> {
-
-            builder.append(COMMENT)
-                    .append(" ")
-                    .append("@")
-                    .append(e.getKey())
-                    .append("=")
-                    .append(e.getValue())
-                    .append("\n");
-        });
+        appendComments(builder, 0);
 
         builder.append(FEATURE).append(statement).append("\n");
-
         descriptions.forEach(d -> {
-            builder.append(INDENT).append(d).append("\n");
+            if(d != null && d.trim().length() > 0) {
+                builder.append(INDENT).append(d).append("\n");
+            }
         });
 
+        if (background != null) {
+            builder.append("\n");
+            background.append(builder, 1);
+        }
+
         scenarios.values().forEach(s -> {
-            builder.append(s).append("\n");
+            builder.append("\n");
+            s.append(builder, 1);
         });
 
         return builder.toString();
@@ -68,6 +65,11 @@ public class Feature extends GherkinSyntaxNode {
 
         public FeatureBuilder addDescription(String line) {
             feature.descriptions.add(line);
+            return this;
+        }
+
+        public FeatureBuilder addBackground(Background background) {
+            feature.background = background;
             return this;
         }
 

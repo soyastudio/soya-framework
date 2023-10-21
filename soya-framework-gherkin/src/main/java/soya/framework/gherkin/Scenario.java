@@ -3,10 +3,14 @@ package soya.framework.gherkin;
 import java.util.List;
 
 public class Scenario extends GherkinSyntaxNode {
-    private String name;
-    private StepHolder given;
-    private StepHolder when;
-    private StepHolder then;
+    protected String name;
+    protected StepHolder given;
+    protected StepHolder when;
+    protected StepHolder then;
+
+    public Scenario() {
+        super();
+    }
 
     protected Scenario(String statement, List<String> comments) {
         super(statement, comments);
@@ -17,46 +21,28 @@ public class Scenario extends GherkinSyntaxNode {
         return name;
     }
 
-    public String toString() {
-        System.out.println("============= given: " + given);
-        System.out.println("============= when: " + when);
-        System.out.println("============= then: " + then);
+    public void append(StringBuilder builder, int indent) {
 
-        StringBuilder builder = new StringBuilder();
-        comments.forEach(c -> {
-            builder.append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append(c)
-                    .append("\n");
-        });
+        appendComments(builder, indent);
 
-        annotations.entrySet().forEach(e -> {
-
-            builder.append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append("@")
-                    .append(e.getKey())
-                    .append("=")
-                    .append(e.getValue())
-                    .append("\n");
-        });
-
-        builder.append(INDENT).append(SCENARIO).append(statement).append("\n");
+        builder.append(INDENTS[indent]).append(SCENARIO).append(statement).append("\n");
 
         if(given != null) {
-            builder.append(given);
+            given.append(builder, 2);
         }
 
         if(when != null) {
-            builder.append(when);
+            when.append(builder, 2);
         }
 
         if(then != null) {
-            builder.append(then);
+            then.append(builder, 2);
         }
+    }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        append(builder, 1);
         return builder.toString();
     }
 
@@ -64,12 +50,13 @@ public class Scenario extends GherkinSyntaxNode {
         return new ScenarioBuilder(statement, comments);
     }
 
-    public static class ScenarioBuilder extends NodeBuilder<ScenarioBuilder> {
+    public static class ScenarioBuilder extends GherkinNodeBuilder<ScenarioBuilder> {
 
         private Scenario scenario;
         private StepHolder stepHolder;
 
-        private ScenarioBuilder(String statement, List<String> comments) {
+        protected ScenarioBuilder(String statement, List<String> comments) {
+            super();
             this.scenario = new Scenario(statement, comments);
         }
 

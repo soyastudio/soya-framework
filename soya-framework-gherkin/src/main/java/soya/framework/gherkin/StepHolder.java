@@ -20,39 +20,22 @@ public class StepHolder extends GherkinSyntaxNode {
         return steps.toArray(new StepDefinition[steps.size()]);
     }
 
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-
-        comments.forEach(c -> {
-            builder.append(INDENT).append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append(c)
-                    .append("\n");
-        });
-
-        annotations.entrySet().forEach(e -> {
-
-            builder.append(INDENT).append(INDENT)
-                    .append(COMMENT)
-                    .append(" ")
-                    .append("@")
-                    .append(e.getKey())
-                    .append("=")
-                    .append(e.getValue())
-                    .append("\n");
-        });
-
-        builder.append(INDENT).append(INDENT)
+    public void append(StringBuilder builder, int indent) {
+        appendComments(builder, indent);
+        builder.append(INDENTS[indent])
                 .append(type)
                 .append(" ")
                 .append(statement)
                 .append("\n");
 
         steps.forEach(a -> {
-            builder.append(a);
+            a.append(builder, indent);
         });
+    }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        append(builder, 2);
         return builder.toString();
     }
 
