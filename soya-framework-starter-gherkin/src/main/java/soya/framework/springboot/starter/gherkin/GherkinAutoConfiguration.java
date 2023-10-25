@@ -6,6 +6,7 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import soya.framework.gherkin.GherkinEngine;
+import soya.framework.restruts.ActionServlet;
 
 import java.util.logging.Logger;
 
@@ -27,7 +28,7 @@ public class GherkinAutoConfiguration {
 
     @Bean
     ServletRegistrationBean actionServlet() {
-        ServletRegistrationBean bean = new ServletRegistrationBean(new GherkinServlet(),
+        ServletRegistrationBean bean = new ServletRegistrationBean(new ActionServlet(),
                 properties.getPath());
         bean.setLoadOnStartup(5);
         return bean;

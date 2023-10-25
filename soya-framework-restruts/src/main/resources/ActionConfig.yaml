@@ -1,0 +1,4 @@
+Service:
+
+ActionMapping:
+  action: class://soya.framework.restruts.actions.EchoAction?message=HEAD&

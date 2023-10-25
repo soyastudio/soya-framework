@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public final class ActionDomain implements Comparable<ActionDomain>, Serializable {
-
     private final String name;
     private final String path;
     private final String title;

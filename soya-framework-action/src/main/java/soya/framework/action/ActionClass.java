@@ -19,7 +19,6 @@ public final class ActionClass implements Serializable {
     private transient Map<String, Field> options = new LinkedHashMap<>();
 
     private final ActionName actionName;
-    private final String resultFormat;
 
     ActionClass(Class<? extends ActionCallable> actionType) {
 
@@ -46,8 +45,6 @@ public final class ActionClass implements Serializable {
             }
         }
 
-        this.resultFormat = mapping.produces()[0];
-
         // ------------
         ACTION_CLASSES.put(actionName, this);
         ACTION_TYPES.put(actionType, this);
@@ -72,10 +69,6 @@ public final class ActionClass implements Serializable {
         } else {
             return actionFields.get(name);
         }
-    }
-
-    public String getResultFormat() {
-        return resultFormat;
     }
 
     public String toURI() {

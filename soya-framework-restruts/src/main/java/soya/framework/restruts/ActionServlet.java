@@ -1,10 +1,9 @@
-package soya.framework.springboot.starter.gherkin;
+package soya.framework.restruts;
 
-import soya.framework.gherkin.DefaultFeatureVisitor;
-import soya.framework.gherkin.Feature;
-import soya.framework.gherkin.FeatureParser;
-import soya.framework.gherkin.GherkinEngine;
+import soya.framework.context.ServiceLocator;
+import soya.framework.context.ServiceLocatorSingleton;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -16,8 +15,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
-public class GherkinServlet extends HttpServlet {
+public class ActionServlet extends HttpServlet {
+
+    private static Logger logger = Logger.getLogger(ActionServlet.class.getName());
     protected Map<String, Method> getMethods = new HashMap<>();
     protected Map<String, Method> postMethods = new HashMap<>();
     protected Map<String, Method> putMethods = new HashMap<>();
@@ -26,29 +28,26 @@ public class GherkinServlet extends HttpServlet {
 
     private ServletRegistration registration;
 
-    private GherkinEngine gherkinEngine;
-
-    public GherkinServlet() {
+    public ActionServlet() {
         super();
         Arrays.stream(getClass().getDeclaredMethods()).forEach(method -> {
-            RestMapping restMapping = method.getAnnotation(RestMapping.class);
+            RestAction restMapping = method.getAnnotation(RestAction.class);
             if (restMapping != null) {
-                if (RestMapping.HttpMethod.GET.equals(restMapping.method())) {
+                if (HttpMethod.GET.equals(restMapping.method())) {
                     getMethods.put(restMapping.path(), method);
 
-                } else if (RestMapping.HttpMethod.POST.equals(restMapping.method())) {
+                } else if (HttpMethod.POST.equals(restMapping.method())) {
                     postMethods.put(restMapping.path(), method);
 
-                } else if (RestMapping.HttpMethod.PUT.equals(restMapping.method())) {
+                } else if (HttpMethod.PUT.equals(restMapping.method())) {
                     putMethods.put(restMapping.path(), method);
 
-                } else if (RestMapping.HttpMethod.DELETE.equals(restMapping.method())) {
+                } else if (HttpMethod.DELETE.equals(restMapping.method())) {
                     deleteMethods.put(restMapping.path(), method);
 
                 }
             }
         });
-
 
     }
 
@@ -56,8 +55,9 @@ public class GherkinServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         this.registration = config.getServletContext().getServletRegistration(getServletName());
-        this.gherkinEngine = GherkinEngine.getInstance();
 
+        ServiceLocator locator = ServiceLocatorSingleton.getInstance();
+        System.out.println("=================== " + locator);
 
     }
 
@@ -83,8 +83,6 @@ public class GherkinServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Feature feature = FeatureParser.parse(req.getInputStream(), new DefaultFeatureVisitor());
-        System.out.println(feature);
         dispatch(req, resp);
     }
 
@@ -99,12 +97,8 @@ public class GherkinServlet extends HttpServlet {
     }
 
     protected void dispatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Method method;
-        RestMapping.HttpMethod httpMethod = RestMapping.HttpMethod.valueOf(req.getMethod().toUpperCase());
-        if (RestMapping.HttpMethod.GET.equals(httpMethod)) {
-
-        }
-
+        AsyncContext asyncContext = req.startAsync();
+        asyncContext.start(new RestActionTask(asyncContext));
     }
 
     private String actionPath(HttpServletRequest req) {
@@ -117,7 +111,6 @@ public class GherkinServlet extends HttpServlet {
 
         return path;
     }
-
 
     private String getBody(HttpServletRequest request) throws IOException {
 
@@ -163,11 +156,6 @@ public class GherkinServlet extends HttpServlet {
         }
 
         outputStream.flush();
-    }
-
-    @RestMapping(method = RestMapping.HttpMethod.GET, path = "/xyz")
-    public void list(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
     }
 
 }

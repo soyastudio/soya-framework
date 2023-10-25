@@ -49,6 +49,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-restruts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>
