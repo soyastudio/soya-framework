@@ -19,18 +19,29 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>soya.framework</groupId>
-            <artifactId>soya-framework-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-domain -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

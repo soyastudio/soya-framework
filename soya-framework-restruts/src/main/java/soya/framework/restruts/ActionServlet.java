@@ -1,7 +1,7 @@
 package soya.framework.restruts;
 
-import soya.framework.context.ServiceLocator;
-import soya.framework.context.ServiceLocatorSingleton;
+import soya.framework.restruts.api.Swagger;
+import soya.framework.restruts.api.SwaggerRenderer;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletConfig;
@@ -28,10 +28,13 @@ public class ActionServlet extends HttpServlet {
 
     private ServletRegistration registration;
 
+    private RestActionRegistration restActionRegistration = new RestActionRegistration();
+    private RestApiRenderer renderer = new SwaggerRenderer();
+
     public ActionServlet() {
         super();
         Arrays.stream(getClass().getDeclaredMethods()).forEach(method -> {
-            RestAction restMapping = method.getAnnotation(RestAction.class);
+            RestActionMapping restMapping = method.getAnnotation(RestActionMapping.class);
             if (restMapping != null) {
                 if (HttpMethod.GET.equals(restMapping.method())) {
                     getMethods.put(restMapping.path(), method);
@@ -55,9 +58,6 @@ public class ActionServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         this.registration = config.getServletContext().getServletRegistration(getServletName());
-
-        ServiceLocator locator = ServiceLocatorSingleton.getInstance();
-        System.out.println("=================== " + locator);
 
     }
 
@@ -157,5 +157,95 @@ public class ActionServlet extends HttpServlet {
 
         outputStream.flush();
     }
+
+/*
+
+    protected void initSwagger(ActionMappings mappings) {
+        logger.info("initializing swagger");
+
+        Swagger.SwaggerBuilder builder = Swagger.builder();
+        String path = this.getServletInfo();
+        for (String e : registration.getMappings()) {
+            if (e.endsWith("/*")) {
+                path = e.substring(0, e.lastIndexOf("/*"));
+            }
+        }
+        builder.basePath(path);
+
+        mappings.domains().forEach(dm -> {
+            builder.addTag(Swagger.TagObject.instance()
+                    .name(dm.getTitle().isEmpty() ? dm.getName() : dm.getTitle())
+                    .description(dm.getDescription()));
+
+            dm.getActionMappings().forEach(am -> {
+                ActionName actionName = am.getActionName();
+                String httpMethod = am.getHttpMethod().toUpperCase();
+
+                String fullPath = dm.getPath() + am.getPath();
+
+                String operationId = dm.getName().replaceAll("_", "-")
+                        + "_"
+                        + actionName.getName().replaceAll("_", "-");
+
+                Swagger.PathBuilder pathBuilder = null;
+                if (httpMethod.equals("GET")) {
+                    pathBuilder = builder.get(fullPath, operationId);
+
+                } else if (httpMethod.equals("POST")) {
+                    pathBuilder = builder.post(fullPath, operationId);
+
+                } else if (httpMethod.equals("DELETE")) {
+                    pathBuilder = builder.delete(fullPath, operationId);
+
+                } else if (httpMethod.equals("PUT")) {
+                    pathBuilder = builder.put(fullPath, operationId);
+
+                } else if (httpMethod.equals("HEAD")) {
+                    pathBuilder = builder.head(fullPath, operationId);
+
+                } else if (httpMethod.equals("OPTIONS")) {
+                    pathBuilder = builder.options(fullPath, operationId);
+
+                } else if (httpMethod.equals("PATCH")) {
+                    pathBuilder = builder.patch(fullPath, operationId);
+
+                }
+
+                pathBuilder.description(am.getDescription());
+                pathBuilder.addTag(dm.getTitle() != null && !dm.getTitle().isEmpty() ? dm.getTitle() : dm.getName());
+                pathBuilder.produces(am.getProduce());
+
+                if (pathBuilder != null) {
+                    for (ParameterMapping pm : am.getParameters()) {
+                        String name = pm.getName();
+                        ActionParameterType paramType = pm.getParameterType();
+
+                        if (ActionParameterType.PATH_PARAM.equals(paramType)) {
+                            pathBuilder.parameterBuilder(name, "path", pm.getDescription()).build();
+
+                        } else if (ActionParameterType.QUERY_PARAM.equals(paramType)) {
+                            pathBuilder.parameterBuilder(name, "query", pm.getDescription()).build();
+
+                        } else if (ActionParameterType.HEADER_PARAM.equals(paramType)) {
+                            pathBuilder.parameterBuilder(name, "header", pm.getDescription()).build();
+
+                        } else if (ActionParameterType.COOKIE_PARAM.equals(paramType)) {
+                            pathBuilder.parameterBuilder(name, "cookie", pm.getDescription()).build();
+
+                        } else if (ActionParameterType.PAYLOAD.equals(paramType)) {
+                            pathBuilder.bodyParameterBuilder(name, pm.getDescription())
+                                    .build()
+                                    .consumes(pm.getContentType());
+                        }
+                    }
+                }
+                pathBuilder.build();
+            });
+        });
+
+        this.swagger = builder.build();
+    }
+*/
+
 
 }

@@ -5,8 +5,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RestAction {
-    String action();
+public @interface RestActionMapping {
+    String action() default "";
 
     HttpMethod method();
 

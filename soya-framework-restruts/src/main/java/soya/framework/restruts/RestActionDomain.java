@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 public @interface RestActionDomain {
     String path() default "/";
 
-    RestAction[] actions();
+    RestActionMapping[] actions();
 }

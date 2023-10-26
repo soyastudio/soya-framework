@@ -27,6 +27,7 @@ public class RestActionTask implements Runnable {
             Object result = action.call();
 
             out.flush();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
 
@@ -37,7 +38,7 @@ public class RestActionTask implements Runnable {
     }
 
     protected Callable create(HttpServletRequest request, Class<? extends Callable> actionType) throws Exception {
-        RestAction mapping = actionType.getAnnotation(RestAction.class);
+        RestActionMapping mapping = actionType.getAnnotation(RestActionMapping.class);
         if (mapping != null) {
 
         } else {
