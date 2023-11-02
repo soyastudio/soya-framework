@@ -1,6 +1,7 @@
 package soya.framework.restruts;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -207,9 +208,17 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
             return result;
         }
 
-        public boolean match(String path) {
-            System.out.println("================= matching?");
+        @Override
+        public int compareTo(Path o) {
+            int result = path.compareTo(o.path);
+            if (result == 0) {
+                result = sort(method) - sort(o.method);
+            }
 
+            return result;
+        }
+
+        public boolean match(String path) {
             String[] items = path.split("/");
             if(pathItems.length > items.length) {
                 return false;
@@ -224,14 +233,17 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
             return true;
         }
 
-        @Override
-        public int compareTo(Path o) {
-            int result = path.compareTo(o.path);
-            if (result == 0) {
-                result = sort(method) - sort(o.method);
+        public Map<String, String> compile(String path) {
+            Map<String, String> values = new HashMap<>();
+            String[] items = path.split(",");
+            for(int i = 0; i < pathItems.length; i ++) {
+                String token = pathItems[i];
+                if(token.startsWith("{") && token.endsWith("}")) {
+                    String key = token.substring(1, token.length() - 1);
+                    values.put(key, items[i]);
+                }
             }
-
-            return result;
+            return values;
         }
 
         private static int sort(String method) {
