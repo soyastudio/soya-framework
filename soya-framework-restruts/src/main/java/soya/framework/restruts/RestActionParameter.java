@@ -8,6 +8,10 @@ import java.lang.annotation.*;
 public @interface RestActionParameter {
     String name();
 
-    HttpParam httpParam();
+    ParamType paramType();
+
+    String referredTo() default "";
+
+    String description() default "";
 
 }

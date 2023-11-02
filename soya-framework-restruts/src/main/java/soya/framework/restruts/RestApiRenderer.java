@@ -1,5 +1,5 @@
 package soya.framework.restruts;
 
 public interface RestApiRenderer {
-    String render(RestActionRegistration registration);
+    String render(RestActionContext registration);
 }

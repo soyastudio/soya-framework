@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+logging:
+  level:
+    soya.framework: DEBUG
+
+soya:
+  framework:
+    property: www
+    name: Wen Qun
+    restruts:
+      scanPackages: soya.framework.restruts.reflect,soya.framework.spring.actions

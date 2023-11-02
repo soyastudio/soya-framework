@@ -2,11 +2,10 @@ package soya.framework.restruts;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.PACKAGE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RestActionDomain {
-    String path() default "/";
-
-    RestActionMapping[] actions();
+    String domain();
+    RestAction[] actions() default {};
 }

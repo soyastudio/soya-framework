@@ -1,2 +1,0 @@
-# Auto Configuration
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=soya.framework.springboot.starter.gherkin.GherkinAutoConfiguration
