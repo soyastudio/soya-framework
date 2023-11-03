@@ -1,26 +1,59 @@
 package soya.framework.restruts.springboot.starter;
 
+import org.springframework.context.ApplicationContext;
 import soya.framework.restruts.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 class DefaultRestActionContext implements RestActionContext {
+
+    private ApplicationContext applicationContext;
+
     private Map<ActionMapping.Path, ActionMapping> registrations = new HashMap();
     private List<ActionMapping> pathMappings = new ArrayList<>();
-    private DependencyInjector injector;
+
+    private ResourceLoader injector;
     private Map<String, Serializer> serializerMap = new HashMap<>();
-    private RestActionFactory actionFactory = new DefaultRestActionFactory();
 
     private String apiPath;
     private String api;
 
-    public DependencyInjector getDependencyInjector() {
+    public DefaultRestActionContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    public ResourceLoader getDependencyInjector() {
         return injector;
     }
 
-    public RestActionFactory getActionFactory() {
-        return actionFactory;
+    @Override
+    public String getWiredProperty(String propName) {
+        return applicationContext.getEnvironment().getProperty(propName);
+    }
+
+    @Override
+    public Object getWiredService(String name) {
+        try{
+            return applicationContext.getBean(name);
+        } catch (Exception e) {
+            try {
+                return applicationContext.getBean(Class.forName(name));
+
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    @Override
+    public <T> T getWiredService(String name, Class<T> type) {
+        return applicationContext.getBean(name, type);
+    }
+
+    @Override
+    public <T> T getResource(String url, Class<T> type) {
+        return null;
     }
 
     public Serializer getSerializer(String mediaType) {
@@ -47,11 +80,10 @@ class DefaultRestActionContext implements RestActionContext {
             Iterator<ActionMapping> iterator = pathMappings.iterator();
             while (iterator.hasNext()) {
                 ActionMapping next = iterator.next();
-                if(next.getPath().equals(key)) {
+                if (next.getPath().equals(key)) {
                     return next;
                 }
             }
-
             return null;
         }
     }
@@ -73,12 +105,7 @@ class DefaultRestActionContext implements RestActionContext {
         this.api = api;
     }
 
-    DefaultRestActionContext register(RestActionFactory actionFactory) {
-        this.actionFactory = actionFactory;
-        return this;
-    }
-
-    DefaultRestActionContext register(DependencyInjector injector) {
+    DefaultRestActionContext register(ResourceLoader injector) {
         this.injector = injector;
         return this;
     }

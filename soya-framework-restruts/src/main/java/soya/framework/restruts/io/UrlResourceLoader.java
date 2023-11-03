@@ -1,11 +1,11 @@
 package soya.framework.restruts.io;
 
-import soya.framework.restruts.DependencyInjector;
+import soya.framework.restruts.ResourceLoader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class UrlResourceInjector implements DependencyInjector {
+public class UrlResourceLoader implements ResourceLoader {
     private static final String HTTP = "http:";
     private static final String HTTPS = "https";
     private static final String[] NAMESPACES = {

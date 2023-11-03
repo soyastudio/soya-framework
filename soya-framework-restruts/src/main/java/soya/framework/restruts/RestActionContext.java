@@ -4,16 +4,22 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface RestActionContext {
 
-    DependencyInjector getDependencyInjector();
+    String getWiredProperty(String propName);
 
-    RestActionFactory getActionFactory();
+    Object getWiredService(String name);
+
+    <T> T getWiredService(String name, Class<T> type);
+
+    <T> T getResource(String url, Class<T> type);
+
+    ActionMapping[] getActionMappings();
+
+    ActionMapping getActionMapping(HttpServletRequest request);
 
     Serializer getSerializer(String mediaType);
 
-    ActionMapping[] getActionMappings();
-    ActionMapping getActionMapping(HttpServletRequest request);
-
     String getApiPath();
+
     String getApi();
 
 }

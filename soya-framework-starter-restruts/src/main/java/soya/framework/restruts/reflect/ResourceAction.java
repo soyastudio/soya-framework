@@ -18,6 +18,6 @@ public class ResourceAction extends Action<String> {
 
     @Override
     public String call() throws Exception {
-        return getRestActionContext().getDependencyInjector().getWiredResource(url, String.class);
+        return getRestActionContext().getResource(url, String.class);
     }
 }

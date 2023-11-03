@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 public abstract class AbstractAction<T> implements Callable<T> {
     @RestActionParameter(
             name = "message",
-            paramType = ParamType.AUTO_WIRED,
+            paramType = ParamType.WIRED_RESOURCE,
             referredTo = "http://")
     protected String message;
 }

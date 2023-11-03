@@ -2,25 +2,26 @@ package soya.framework.restruts.springboot.starter;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import soya.framework.restruts.DependencyInjector;
-import soya.framework.restruts.io.ClasspathResourceInjector;
-import soya.framework.restruts.io.FileResourceInjector;
-import soya.framework.restruts.io.UrlResourceInjector;
+import soya.framework.restruts.ResourceLoader;
+import soya.framework.restruts.io.ClasspathResourceLoader;
+import soya.framework.restruts.io.FileResourceLoader;
+import soya.framework.restruts.io.UrlResourceLoader;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultDependencyInjector implements DependencyInjector {
-    private Map<String, DependencyInjector> injectors = new HashMap<>();
+public class DefaultResourceLoader implements ResourceLoader {
+
+    private Map<String, ResourceLoader> injectors = new HashMap<>();
 
     private ApplicationContext applicationContext;
 
-    DefaultDependencyInjector(ApplicationContext applicationContext) {
+    DefaultResourceLoader(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.add(new ClasspathResourceInjector())
-                .add(new FileResourceInjector())
-                .add(new UrlResourceInjector());
+        this.add(new ClasspathResourceLoader())
+                .add(new FileResourceLoader())
+                .add(new UrlResourceLoader());
     }
 
     @Override
@@ -43,7 +44,7 @@ public class DefaultDependencyInjector implements DependencyInjector {
         }
     }
 
-    DefaultDependencyInjector add(DependencyInjector injector) {
+    DefaultResourceLoader add(ResourceLoader injector) {
         Arrays.stream(injector.getNamespaces()).forEach(e -> {
             injectors.put(e, injector);
         });

@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
                 ),
                 @RestActionParameter(
                         name = "service",
-                        paramType = ParamType.AUTO_WIRED,
+                        paramType = ParamType.WIRED_SERVICE,
                         referredTo = "soya.framework.spring.service.DemoService"
                 )
         },

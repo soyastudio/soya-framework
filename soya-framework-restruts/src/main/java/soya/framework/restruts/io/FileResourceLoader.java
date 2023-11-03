@@ -1,14 +1,13 @@
 package soya.framework.restruts.io;
 
 import org.apache.commons.io.IOUtils;
-import soya.framework.restruts.DependencyInjector;
+import soya.framework.restruts.ResourceLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-public class FileResourceInjector implements DependencyInjector {
+public class FileResourceLoader implements ResourceLoader {
 
     private static final String FILE = "file:";
     private static final String[] NAMESPACES = {

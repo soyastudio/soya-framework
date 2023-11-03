@@ -1,12 +1,12 @@
 package soya.framework.restruts.io;
 
 import org.apache.commons.io.IOUtils;
-import soya.framework.restruts.DependencyInjector;
+import soya.framework.restruts.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ClasspathResourceInjector implements DependencyInjector {
+public class ClasspathResourceLoader implements ResourceLoader {
 
     private static final String CLASSPATH = "classpath:";
     private static final String[] NAMESPACES = {CLASSPATH};

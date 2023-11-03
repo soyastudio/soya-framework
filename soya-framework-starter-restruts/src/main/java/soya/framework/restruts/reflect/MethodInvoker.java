@@ -19,7 +19,7 @@ public class MethodInvoker {
     }
 
     public Object execute(RestActionContext context, String input) throws Exception {
-        Object service = context.getDependencyInjector().getWiredResource(className);
+        Object service = context.getWiredService(className);
 
         Method method = getMethod(service.getClass(), methodName, paramTypes);
         Class<?>[] argTypes = method.getParameterTypes();

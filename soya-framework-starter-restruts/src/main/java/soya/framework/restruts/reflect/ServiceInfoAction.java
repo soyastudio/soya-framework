@@ -24,7 +24,7 @@ public class ServiceInfoAction extends ReflectAction<String> {
 
     @Override
     public String call() throws Exception {
-        Object o = getRestActionContext().getDependencyInjector().getWiredResource(service);
+        Object o = getRestActionContext().getWiredService(service);
 
         StringBuilder sb = new StringBuilder();
         Method[] methods = o.getClass().getDeclaredMethods();

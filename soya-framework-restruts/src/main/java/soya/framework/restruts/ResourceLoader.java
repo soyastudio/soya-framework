@@ -1,11 +1,12 @@
 package soya.framework.restruts;
 
-public interface DependencyInjector {
+public interface ResourceLoader {
+
     String[] getNamespaces();
 
-    Object getWiredResource(String name);
+    Object getWiredResource(String url);
 
-    <T> T getWiredResource(String resource, Class<T> type);
+    <T> T getWiredResource(String url, Class<T> type);
 
     class ResourceNotFoundException extends RuntimeException {
 

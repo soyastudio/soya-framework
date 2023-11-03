@@ -46,7 +46,6 @@ public class DirectRestActionLoader implements RestActionLoader {
 
             set.add(builder.create());
 
-
         });
         return set;
     }

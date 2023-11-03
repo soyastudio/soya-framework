@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import soya.framework.restruts.*;
 import soya.framework.restruts.api.OpenApi300Publisher;
@@ -25,10 +24,14 @@ import java.util.logging.Logger;
 @Configuration
 @EnableConfigurationProperties(RestrutsProperties.class)
 public class RestrutsAutoConfiguration {
+
     private static Logger logger = Logger.getLogger(RestrutsAutoConfiguration.class.getName());
 
     @Autowired
     private RestrutsProperties properties;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Bean
     RestApiRenderer restApiRenderer() {
@@ -36,13 +39,9 @@ public class RestrutsAutoConfiguration {
     }
 
     @Bean
-    RestActionFactory actionFactory() {
-        return new DefaultRestActionFactory();
-    }
+    DefaultRestActionContext restActionContext(ApplicationContext applicationContext) {
+        DefaultRestActionContext registration = new DefaultRestActionContext(applicationContext);
 
-    @Bean
-    DefaultRestActionContext restActionContext() {
-        DefaultRestActionContext registration = new DefaultRestActionContext();
         registration.setApiPath(properties.getApiPath());
         return registration;
     }
@@ -58,24 +57,15 @@ public class RestrutsAutoConfiguration {
     @EventListener
     void onEvent(ApplicationStartedEvent event) {
         ApplicationContext context = event.getApplicationContext();
-        Environment environment = context.getEnvironment();
-
-        Arrays.stream(context.getBeanDefinitionNames()).forEach(b -> {
-            System.out.println("------------- " + b);
-        });
 
         DefaultRestActionContext registration = context.getBean(DefaultRestActionContext.class);
         context.getBeansOfType(RestActionLoader.class).entrySet().forEach(e -> {
             registration.register(e.getValue());
         });
 
-        context.getBeansOfType(RestActionFactory.class).entrySet().forEach(e -> {
-            registration.register(e.getValue());
-        });
-
         if (registration.getDependencyInjector() == null) {
-            DefaultDependencyInjector injector = new DefaultDependencyInjector(context);
-            context.getBeansOfType(DependencyInjector.class).entrySet().forEach(e -> {
+            DefaultResourceLoader injector = new DefaultResourceLoader(context);
+            context.getBeansOfType(ResourceLoader.class).entrySet().forEach(e -> {
                 injector.add(e.getValue());
             });
 
@@ -120,7 +110,6 @@ public class RestrutsAutoConfiguration {
                 registration.register(e);
             });
         }
-
 
 
         if (properties.getSpecification().equalsIgnoreCase("SWAGGER")) {

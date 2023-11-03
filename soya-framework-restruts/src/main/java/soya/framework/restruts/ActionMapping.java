@@ -235,7 +235,7 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
 
         public Map<String, String> compile(String path) {
             Map<String, String> values = new HashMap<>();
-            String[] items = path.split(",");
+            String[] items = path.split("/");
             for(int i = 0; i < pathItems.length; i ++) {
                 String token = pathItems[i];
                 if(token.startsWith("{") && token.endsWith("}")) {

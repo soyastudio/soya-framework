@@ -80,6 +80,7 @@ public class ActionServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 
         } else {
+
             Callable<?> callable = create(actionMapping, req);
             AsyncContext asyncContext = req.startAsync();
 
@@ -114,89 +115,128 @@ public class ActionServlet extends HttpServlet {
     }
 
     private Callable<?> create(ActionMapping mapping, HttpServletRequest request) {
-        Callable<?> callable = context.getActionFactory().create(mapping);
-        Class<?> cls = callable.getClass();
+        try {
+            Class<?> cls = mapping.getActionClass();
+            Callable<?> callable = (Callable<?>) cls.newInstance();
 
-        String accept = request.getHeader("accept");
-        if (accept == null) {
-            if (mapping.getConsumes().length > 0) {
-                accept = mapping.getConsumes()[0];
-            } else {
-                accept = "text/plain";
-            }
-        }
-
-        final String consume = accept;
-        Field[] fields = getFields(cls);
-        Arrays.stream(fields).forEach(f -> {
-            ActionMapping.ParameterMapping param = mapping.getParamMapping(f.getName());
-            if(Modifier.isStatic(f.getModifiers()) || Modifier.isFinal(f.getModifiers())) {
-                // do nothing
-
-            } else if (param == null && f.getAnnotation(RestActionParameter.class) != null) {
-                RestActionParameter annotation = f.getAnnotation(RestActionParameter.class);
-                param = new ActionMapping.ParameterMapping(annotation.name(),
-                        annotation.paramType(),
-                        annotation.referredTo().isEmpty() ? annotation.name() : annotation.referredTo(),
-                        annotation.description());
-            }
-
-            if (param != null) {
-                Class<?> fieldType = f.getType();
-                f.setAccessible(true);
-                if (ParamType.AUTO_WIRED.equals(param.getParameterType())) {
-                    try {
-                        f.set(callable, context.getDependencyInjector().getWiredResource(param.getReferredTo(), fieldType));
-
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else if (ParamType.PAYLOAD.equals(param.getParameterType())) {
-                    try {
-                        f.set(callable, getBody(request, fieldType, consume));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
+            String accept = request.getHeader("accept");
+            if (accept == null) {
+                if (mapping.getConsumes().length > 0) {
+                    accept = mapping.getConsumes()[0];
                 } else {
-                    String value = getParamValue(request, param.getReferredTo(), param.getParameterType());
-                    try {
-                        f.set(callable, convert(value, fieldType));
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-
+                    accept = "text/plain";
                 }
             }
-        });
 
-        if (DispatchAction.class.isAssignableFrom(cls)) {
-            DispatchAction action = (DispatchAction) callable;
-            Arrays.stream(action.getPropertyNames()).forEach(prop -> {
-                Class<?> propType = action.getPropertyType(prop);
-                ActionMapping.ParameterMapping parameterMapping = mapping.getParamMapping(prop);
-                if (parameterMapping != null) {
-                    if (ParamType.AUTO_WIRED.equals(parameterMapping.getParameterType())) {
-                        action.setProperty(prop, context.getDependencyInjector().getWiredResource(parameterMapping.getReferredTo(), propType));
+            final String consume = accept;
 
-                    } else if (ParamType.PAYLOAD.equals(parameterMapping.getParameterType())) {
+            Map<String, String> ppms = null;
+            if (mapping.isPathMapping()) {
+                ppms = mapping.getPath().compile(request.getPathInfo());
+            }
+
+            final Map<String, String> pathParams = ppms;
+            Field[] fields = getFields(cls);
+            Arrays.stream(fields).forEach(f -> {
+                ActionMapping.ParameterMapping param = mapping.getParamMapping(f.getName());
+                if (Modifier.isStatic(f.getModifiers()) || Modifier.isFinal(f.getModifiers())) {
+                    // do nothing
+
+                } else if (param == null && f.getAnnotation(RestActionParameter.class) != null) {
+                    RestActionParameter annotation = f.getAnnotation(RestActionParameter.class);
+                    param = new ActionMapping.ParameterMapping(annotation.name(),
+                            annotation.paramType(),
+                            annotation.referredTo().isEmpty() ? annotation.name() : annotation.referredTo(),
+                            annotation.description());
+                }
+
+                if (param != null) {
+                    Class<?> fieldType = f.getType();
+                    f.setAccessible(true);
+                    if (ParamType.WIRED_PROPERTY.equals(param.getParameterType())) {
+                        String value = context.getWiredProperty(param.getReferredTo());
                         try {
-                            action.setProperty(prop, getBody(request, propType, consume));
-                        } catch (IOException e) {
+                            f.set(callable, ConvertUtils.convert(value, fieldType));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (ParamType.WIRED_SERVICE.equals(param.getParameterType())) {
+                        try {
+                            f.set(callable, context.getWiredService(param.getReferredTo(), fieldType));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (ParamType.WIRED_RESOURCE.equals(param.getParameterType())) {
+                        try {
+                            f.set(callable, context.getResource(param.getReferredTo(), fieldType));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (ParamType.PAYLOAD.equals(param.getParameterType())) {
+                        try {
+                            f.set(callable, getBody(request, fieldType, consume));
+
+                        } catch (IllegalAccessException | IOException e) {
                             throw new RuntimeException(e);
                         }
 
+                    } else if (ParamType.PATH_PARAM.equals(param.getParameterType())) {
+                        if (mapping.isPathMapping()) {
+                            String value = pathParams.get(param.getReferredTo());
+                            try {
+                                f.set(callable, convert(value, fieldType));
+                            } catch (IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+
                     } else {
-                        String value = getParamValue(request, parameterMapping.getReferredTo(), parameterMapping.getParameterType());
-                        action.setProperty(prop, convert(value, propType));
+                        String value = getParamValue(request, param.getReferredTo(), param.getParameterType());
+                        try {
+                            f.set(callable, convert(value, fieldType));
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             });
-        }
 
-        return callable;
+            if (DispatchAction.class.isAssignableFrom(cls)) {
+                DispatchAction action = (DispatchAction) callable;
+                Arrays.stream(action.getPropertyNames()).forEach(prop -> {
+                    Class<?> propType = action.getPropertyType(prop);
+                    ActionMapping.ParameterMapping parameterMapping = mapping.getParamMapping(prop);
+                    if (parameterMapping != null) {
+                        if (ParamType.WIRED_PROPERTY.equals(parameterMapping.getParameterType())) {
+                            String value = context.getWiredProperty(parameterMapping.getReferredTo());
+                            action.setProperty(prop, ConvertUtils.convert(value, propType));
+
+                        } else if (ParamType.WIRED_SERVICE.equals(parameterMapping.getParameterType())) {
+                            action.setProperty(prop, context.getWiredService(parameterMapping.getReferredTo(), propType));
+
+                        } else if (ParamType.WIRED_RESOURCE.equals(parameterMapping.getParameterType())) {
+                            action.setProperty(prop, context.getResource(parameterMapping.getReferredTo(), propType));
+
+                        } else if (ParamType.PAYLOAD.equals(parameterMapping.getParameterType())) {
+                            try {
+                                action.setProperty(prop, getBody(request, propType, consume));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                        } else {
+                            String value = getParamValue(request, parameterMapping.getReferredTo(), parameterMapping.getParameterType());
+                            action.setProperty(prop, convert(value, propType));
+                        }
+                    }
+                });
+            }
+
+            return callable;
+
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private String actionPath(HttpServletRequest req) {
@@ -243,7 +283,8 @@ public class ActionServlet extends HttpServlet {
         } else if (ParamType.QUERY_PARAM.equals(paramType)) {
             value = request.getParameter(param);
 
-        } if (ParamType.PATH_PARAM.equals(paramType)) {
+        }
+        if (ParamType.PATH_PARAM.equals(paramType)) {
             System.out.println("=================== path param: " + request.getPathInfo());
 
         }

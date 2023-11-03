@@ -58,7 +58,7 @@ public abstract class DispatchAction<T> extends Action<T> {
                     name = name.substring(0, index);
                     System.out.println("================= name: " + name);
 
-                    this.instance = this.getWireService(name);
+                   // this.instance = getRestActionContext().getWiredService(name, );
 
                     System.out.println("================= instance: " + instance);
 

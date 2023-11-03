@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
         path = "/file",
         parameters = {
                 @RestActionParameter(name = "file",
-                        paramType = ParamType.AUTO_WIRED,
+                        paramType = ParamType.WIRED_RESOURCE,
                         referredTo = "file:D:/github/soya-framework/LICENSE"
                 )
         }

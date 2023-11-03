@@ -50,7 +50,9 @@ public class OpenApi300Publisher implements RestApiRenderer {
 
         JsonArray params = new JsonArray();
         Arrays.stream(mapping.getParameters()).forEach(p -> {
-            if (p.getParameterType().equals(ParamType.AUTO_WIRED)) {
+            if (p.getParameterType().equals(ParamType.WIRED_PROPERTY)
+                    || p.getParameterType().equals(ParamType.WIRED_SERVICE)
+                    || p.getParameterType().equals(ParamType.WIRED_RESOURCE)) {
 
             } else if (p.getParameterType().equals(ParamType.PAYLOAD)) {
                 operation.add("requestBody", createRequestBody(p, mapping.getConsumes()));

@@ -9,7 +9,6 @@ public enum ParamType {
     MATRIX_PARAM,
     BEAN_PARAM,
     PAYLOAD,
-    AUTO_WIRED,
     WIRED_SERVICE,
     WIRED_PROPERTY,
     WIRED_RESOURCE;

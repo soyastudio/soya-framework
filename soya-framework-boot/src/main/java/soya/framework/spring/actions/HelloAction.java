@@ -23,13 +23,13 @@ import soya.framework.restruts.RestActionParameter;
 )
 public class HelloAction extends AbstractAction<String> {
 
-    private String id;
+    private int id;
 
     private Long time;
 
     @Override
     public String call() throws Exception {
-        System.out.println("============ message: " + time);
+        System.out.println("============ id: " + id);
         return "Hello World";
     }
 }
