@@ -4,11 +4,11 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface RestActionContext {
 
-    String getWiredProperty(String propName);
+    String getProperty(String propName);
 
-    Object getWiredService(String name);
+    Object getService(String name);
 
-    <T> T getWiredService(String name, Class<T> type);
+    <T> T getService(String name, Class<T> type);
 
     <T> T getResource(String url, Class<T> type);
 
@@ -17,6 +17,8 @@ public interface RestActionContext {
     ActionMapping getActionMapping(HttpServletRequest request);
 
     Serializer getSerializer(String mediaType);
+
+    ExceptionHandler getExceptionHandler();
 
     String getApiPath();
 

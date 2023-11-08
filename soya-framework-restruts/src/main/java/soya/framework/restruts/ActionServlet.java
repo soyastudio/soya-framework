@@ -2,6 +2,7 @@ package soya.framework.restruts;
 
 import org.apache.commons.io.IOUtils;
 import soya.framework.restruts.util.ConvertUtils;
+import soya.framework.restruts.util.ReflectUtils;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletConfig;
@@ -81,8 +82,8 @@ public class ActionServlet extends HttpServlet {
 
         } else {
 
-            Callable<?> callable = create(actionMapping, req);
-            AsyncContext asyncContext = req.startAsync();
+            final Callable<?> callable = create(actionMapping, req);
+            final AsyncContext asyncContext = req.startAsync();
 
             String contentType = req.getHeader("Content-Type");
             if (contentType == null) {
@@ -105,8 +106,12 @@ public class ActionServlet extends HttpServlet {
                     }
 
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    if(context.getExceptionHandler() != null) {
+                        context.getExceptionHandler().handleException(e, resp);
 
+                    } else {
+                        throw new RuntimeException(e);
+                    }
                 } finally {
                     asyncContext.complete();
                 }
@@ -136,7 +141,7 @@ public class ActionServlet extends HttpServlet {
             }
 
             final Map<String, String> pathParams = ppms;
-            Field[] fields = getFields(cls);
+            Field[] fields = ReflectUtils.getFields(cls);
             Arrays.stream(fields).forEach(f -> {
                 ActionMapping.ParameterMapping param = mapping.getParamMapping(f.getName());
                 if (Modifier.isStatic(f.getModifiers()) || Modifier.isFinal(f.getModifiers())) {
@@ -154,7 +159,7 @@ public class ActionServlet extends HttpServlet {
                     Class<?> fieldType = f.getType();
                     f.setAccessible(true);
                     if (ParamType.WIRED_PROPERTY.equals(param.getParameterType())) {
-                        String value = context.getWiredProperty(param.getReferredTo());
+                        String value = context.getProperty(param.getReferredTo());
                         try {
                             f.set(callable, ConvertUtils.convert(value, fieldType));
                         } catch (IllegalAccessException e) {
@@ -162,7 +167,7 @@ public class ActionServlet extends HttpServlet {
                         }
                     } else if (ParamType.WIRED_SERVICE.equals(param.getParameterType())) {
                         try {
-                            f.set(callable, context.getWiredService(param.getReferredTo(), fieldType));
+                            f.set(callable, context.getService(param.getReferredTo(), fieldType));
                         } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
@@ -203,16 +208,18 @@ public class ActionServlet extends HttpServlet {
 
             if (DispatchAction.class.isAssignableFrom(cls)) {
                 DispatchAction action = (DispatchAction) callable;
+
                 Arrays.stream(action.getPropertyNames()).forEach(prop -> {
                     Class<?> propType = action.getPropertyType(prop);
                     ActionMapping.ParameterMapping parameterMapping = mapping.getParamMapping(prop);
+
                     if (parameterMapping != null) {
                         if (ParamType.WIRED_PROPERTY.equals(parameterMapping.getParameterType())) {
-                            String value = context.getWiredProperty(parameterMapping.getReferredTo());
+                            String value = context.getProperty(parameterMapping.getReferredTo());
                             action.setProperty(prop, ConvertUtils.convert(value, propType));
 
                         } else if (ParamType.WIRED_SERVICE.equals(parameterMapping.getParameterType())) {
-                            action.setProperty(prop, context.getWiredService(parameterMapping.getReferredTo(), propType));
+                            action.setProperty(prop, context.getService(parameterMapping.getReferredTo(), propType));
 
                         } else if (ParamType.WIRED_RESOURCE.equals(parameterMapping.getParameterType())) {
                             action.setProperty(prop, context.getResource(parameterMapping.getReferredTo(), propType));
@@ -251,26 +258,6 @@ public class ActionServlet extends HttpServlet {
         return path;
     }
 
-    private Field[] getFields(Class<?> cls) {
-        if (cls.getSuperclass().equals(Object.class)) {
-            return cls.getDeclaredFields();
-        }
-
-        Map<String, Field> fieldMap = new LinkedHashMap<>();
-        Class<?> parent = cls;
-        while (!parent.equals(Object.class)) {
-            Arrays.stream(parent.getDeclaredFields()).forEach(e -> {
-                if (!Modifier.isStatic(e.getModifiers())
-                        && !Modifier.isFinal(e.getModifiers())
-                        && !fieldMap.containsKey(e.getName())) {
-                    fieldMap.put(e.getName(), e);
-
-                }
-            });
-            parent = parent.getSuperclass();
-        }
-        return fieldMap.values().toArray(new Field[fieldMap.size()]);
-    }
 
     private String getParamValue(HttpServletRequest request, String param, ParamType paramType) {
         String value = null;

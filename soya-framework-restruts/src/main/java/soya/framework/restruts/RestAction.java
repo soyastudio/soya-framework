@@ -9,9 +9,9 @@ public @interface RestAction {
 
     String id() default "";
 
-    HttpMethod method();
-
     String path();
+
+    HttpMethod method();
 
     RestActionParameter[] parameters() default {};
 

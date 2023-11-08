@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MethodInvoker {
-
     String className = null;
     String methodName = null;
     private Class<?>[] paramTypes = {};
@@ -19,14 +18,13 @@ public class MethodInvoker {
     }
 
     public Object execute(RestActionContext context, String input) throws Exception {
-        Object service = context.getWiredService(className);
+        Object service = context.getService(className);
 
         Method method = getMethod(service.getClass(), methodName, paramTypes);
         Class<?>[] argTypes = method.getParameterTypes();
         Object[] argValues = new Object[argTypes.length];
         for (int i = 0; i < argValues.length; i ++) {
             String setting = paramSettings.get(i);
-
             argValues[i] = setting;
         }
 
@@ -34,6 +32,7 @@ public class MethodInvoker {
     }
 
     private void parse(String exp) {
+
         String queryString = null;
         String parameterPart = null;
 

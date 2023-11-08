@@ -2,11 +2,9 @@ package soya.framework.restruts;
 
 public interface ResourceLoader {
 
-    String[] getNamespaces();
+    Object getResource(String url);
 
-    Object getWiredResource(String url);
-
-    <T> T getWiredResource(String url, Class<T> type);
+    <T> T getResource(String url, Class<T> type);
 
     class ResourceNotFoundException extends RuntimeException {
 

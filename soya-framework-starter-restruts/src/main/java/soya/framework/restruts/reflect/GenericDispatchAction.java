@@ -1,7 +1,5 @@
 package soya.framework.restruts.reflect;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import soya.framework.restruts.HttpMethod;
 import soya.framework.restruts.ParamType;
 import soya.framework.restruts.RestAction;
@@ -9,7 +7,7 @@ import soya.framework.restruts.RestActionParameter;
 
 @RestAction(
         id = "dispatch",
-        path = "/restruts/dispatch",
+        path = "/restruts/dispatch/service",
         method = HttpMethod.POST,
         parameters = {
                 @RestActionParameter(name = "url", paramType = ParamType.HEADER_PARAM),
@@ -18,8 +16,7 @@ import soya.framework.restruts.RestActionParameter;
         produces = "text/plain",
         tags = "Restruct"
 )
-public class GenericDispatchAction extends ReflectAction<String> {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+public class GenericDispatchAction extends ReflectAction {
     private String url;
     private String input;
 
@@ -27,7 +24,7 @@ public class GenericDispatchAction extends ReflectAction<String> {
     public String call() throws Exception {
         MethodInvoker invoker = new MethodInvoker(url);
         Object result = invoker.execute(getRestActionContext(), input);
-        if(result instanceof String) {
+        if (result instanceof String) {
             return result.toString();
         } else {
             return GSON.toJson(result);

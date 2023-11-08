@@ -19,12 +19,12 @@ import java.util.Arrays;
         produces = "text/plain",
         tags = "Restruct"
 )
-public class ServiceInfoAction extends ReflectAction<String> {
+public class ServiceInfoAction extends ReflectAction {
     private String service;
 
     @Override
     public String call() throws Exception {
-        Object o = getRestActionContext().getWiredService(service);
+        Object o = getRestActionContext().getService(service);
 
         StringBuilder sb = new StringBuilder();
         Method[] methods = o.getClass().getDeclaredMethods();

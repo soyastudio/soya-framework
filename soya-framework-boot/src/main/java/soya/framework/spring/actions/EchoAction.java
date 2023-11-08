@@ -4,7 +4,7 @@ import soya.framework.restruts.HttpMethod;
 import soya.framework.restruts.ParamType;
 import soya.framework.restruts.RestAction;
 import soya.framework.restruts.RestActionParameter;
-import soya.framework.spring.service.DemoService;
+import soya.framework.spring.service.DemoServiceImpl;
 
 import java.util.concurrent.Callable;
 
@@ -28,7 +28,7 @@ public class EchoAction implements Callable<String> {
 
     private String message;
 
-    private DemoService service;
+    private DemoServiceImpl service;
 
     @Override
     public String call() throws Exception {
