@@ -69,21 +69,25 @@ public final class ActionClass {
         return registrations.get(actionName);
     }
 
-    public Callable<?> newInstance(ActionContext actionContext) {
+    public ActionExecutor<?> newInstance(ActionContext actionContext) {
         try {
             Callable<?> instance = registrations.get(actionName).actionType.newInstance();
+            ActionExecutor<?> task = new ActionExecutor<>(instance);
             propertyMap.values().forEach(p -> {
                 Field field = p.getField();
                 Object value = null;
-                if (p.type.equals(ActionParameterType.WIRED_SERVICE)) {
-                    if(p.getReferredTo().trim().isEmpty()) {
+                if (p.type.equals(ActionParameterType.INPUT)) {
+                    task.addParameter(field, p.referredTo, p.required);
+
+                } else if (p.type.equals(ActionParameterType.WIRED_SERVICE)) {
+                    if (p.getReferredTo().trim().isEmpty()) {
                         value = actionContext.getService(null, field.getType());
                     } else {
                         value = actionContext.getService(p.getReferredTo(), field.getType());
                     }
 
                 } else if (p.type.equals(ActionParameterType.WIRED_PROPERTY)) {
-                    if(p.getReferredTo() == null) {
+                    if (p.getReferredTo() == null) {
                         throw new IllegalArgumentException("'referredTo' is required.");
                     }
                     value = ConvertUtils.convert(actionContext.getProperty(p.getReferredTo()), field.getType());
@@ -93,7 +97,7 @@ public final class ActionClass {
 
                 }
 
-                if(value != null) {
+                if (value != null) {
                     field.setAccessible(true);
                     try {
                         field.set(instance, value);
@@ -103,12 +107,11 @@ public final class ActionClass {
                 }
             });
 
-            return instance;
+            return task;
 
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+
         }
     }
 
