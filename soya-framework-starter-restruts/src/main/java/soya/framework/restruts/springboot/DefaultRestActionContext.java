@@ -2,8 +2,10 @@ package soya.framework.restruts.springboot;
 
 import org.springframework.context.ApplicationContext;
 import soya.framework.restruts.*;
+import soya.framework.restruts.util.ConvertUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
 import java.util.*;
 
 class DefaultRestActionContext implements RestActionContext, DependentInjector {
@@ -18,7 +20,7 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
     private String apiPath;
     private String api;
 
-    public DefaultRestActionContext(ApplicationContext applicationContext) {
+    DefaultRestActionContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -29,7 +31,7 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
 
     @Override
     public Object getService(String name) {
-        try{
+        try {
             return applicationContext.getBean(name);
         } catch (Exception e) {
             try {
@@ -48,7 +50,14 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
 
     @Override
     public <T> T getResource(String url, Class<T> type) {
-        return resourceLoader.getResource(url, type);
+        Resource resource = resourceLoader.load(url);
+        if (String.class.isAssignableFrom(type)) {
+            return (T) resource.getAsString(Charset.defaultCharset());
+
+        } else {
+            return (T) ConvertUtils.convert(resource.getAsString(Charset.defaultCharset()), type);
+
+        }
     }
 
 
@@ -107,15 +116,15 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
     }
 
     DefaultRestActionContext register(ResourceLoader loader) {
-        if(loader instanceof RestActionContextAware) {
+        if (loader instanceof RestActionContextAware) {
             ((RestActionContextAware) loader).setContext(this);
         }
-        resourceLoader.add((NamespaceResourceLoader) loader);
+        resourceLoader.add(loader);
         return this;
     }
 
     DefaultRestActionContext register(String mediaType, Serializer serializer) {
-        if(serializer instanceof RestActionContextAware) {
+        if (serializer instanceof RestActionContextAware) {
             ((RestActionContextAware) serializer).setContext(this);
         }
         serializerMap.put(mediaType.toUpperCase(), serializer);
@@ -140,7 +149,7 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
     @Override
     public Map<String, String> getServiceRegistrations() {
         Map<String, String> map = new HashMap<>();
-        String[] arr =  applicationContext.getBeanDefinitionNames();
+        String[] arr = applicationContext.getBeanDefinitionNames();
         Arrays.stream(arr).forEach(e -> {
             map.put(e, applicationContext.getBean(e).getClass().getName());
         });

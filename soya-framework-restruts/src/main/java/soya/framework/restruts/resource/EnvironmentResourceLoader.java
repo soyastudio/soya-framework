@@ -1,11 +1,9 @@
 package soya.framework.restruts.resource;
 
-import soya.framework.restruts.NamespaceResourceLoader;
-import soya.framework.restruts.RestActionContext;
-import soya.framework.restruts.RestActionContextAware;
+import soya.framework.restruts.*;
 import soya.framework.restruts.util.ConvertUtils;
 
-public class EnvironmentResourceLoader implements NamespaceResourceLoader, RestActionContextAware {
+public class EnvironmentResourceLoader implements NamespaceAware, RestActionContextAware, ResourceLoader {
     private static final String ENVIRONMENT = "env:";
     private static final String[] NAMESPACES = {ENVIRONMENT};
 
@@ -22,13 +20,9 @@ public class EnvironmentResourceLoader implements NamespaceResourceLoader, RestA
     }
 
     @Override
-    public String getResource(String url) {
-        String propName = url.substring(ENVIRONMENT.length());
-        return context.getProperty(propName);
+    public Resource load(String location) throws ResourceException {
+        return null;
     }
 
-    @Override
-    public <T> T getResource(String url, Class<T> type) {
-        return (T) ConvertUtils.convert(getResource(url), type);
-    }
+
 }

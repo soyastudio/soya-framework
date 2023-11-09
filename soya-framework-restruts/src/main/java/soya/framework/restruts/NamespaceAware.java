@@ -1,5 +1,5 @@
 package soya.framework.restruts;
 
-public interface NamespaceResourceLoader extends ResourceLoader {
+public interface NamespaceAware {
     String[] getNamespaces();
 }

@@ -1,15 +1,17 @@
-package soya.framework.action.annotation;
+package soya.framework.action;
 
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ActionName {
+public @interface ActionDefinition {
     String domain();
 
-    String action();
+    String name();
 
     String description() default "";
+
+    ActionParameter[] parameters() default {};
 
 }

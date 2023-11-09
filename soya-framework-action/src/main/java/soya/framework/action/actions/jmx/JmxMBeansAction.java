@@ -1,5 +1,7 @@
 package soya.framework.action.actions.jmx;
 
+import soya.framework.action.ActionDefinition;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
@@ -9,6 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@ActionDefinition(
+        domain = "jmx",
+        name = "mbeans"
+)
 public class JmxMBeansAction extends JmxAction<String[]> {
 
     @Override

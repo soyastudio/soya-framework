@@ -1,8 +1,9 @@
 package soya.framework.restruts.springboot;
 
-import soya.framework.restruts.NamespaceResourceLoader;
+import soya.framework.restruts.NamespaceAware;
+import soya.framework.restruts.Resource;
 import soya.framework.restruts.ResourceLoader;
-import soya.framework.restruts.resource.UrlResourceLoader;
+import soya.framework.restruts.resource.URLResourceLoader;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,36 +11,29 @@ import java.util.Map;
 
 public class DefaultResourceLoader implements ResourceLoader {
 
-    private UrlResourceLoader defaultLoader = new UrlResourceLoader();
+    private URLResourceLoader defaultLoader = new URLResourceLoader();
     private Map<String, ResourceLoader> loaders = new HashMap<>();
 
     DefaultResourceLoader() {
     }
 
-    @Override
-    public Object getResource(String url) {
-        String ns = getNamespace(url);
-        if(loaders.containsKey(ns)) {
-            return loaders.get(ns).getResource(url);
+    public Resource load(String location) {
+
+        String ns = getNamespace(location);
+        if (loaders.containsKey(ns)) {
+            return loaders.get(ns).load(location);
         }
 
-        return defaultLoader.getResource(url);
+        return defaultLoader.load(location);
     }
 
-    @Override
-    public <T> T getResource(String url, Class<T> type) {
-        String ns = getNamespace(url);
-        if(loaders.containsKey(ns)) {
-            return loaders.get(ns).getResource(url, type);
+    DefaultResourceLoader add(ResourceLoader resourceLoader) {
+        if (resourceLoader instanceof NamespaceAware) {
+            String[] ns = ((NamespaceAware) resourceLoader).getNamespaces();
+            Arrays.stream(ns).forEach(e -> {
+                loaders.put(e, resourceLoader);
+            });
         }
-
-        return defaultLoader.getResource(url, type);
-    }
-
-    DefaultResourceLoader add(NamespaceResourceLoader resourceLoader) {
-        Arrays.stream(resourceLoader.getNamespaces()).forEach(e -> {
-            loaders.put(e, resourceLoader);
-        });
         return this;
     }
 

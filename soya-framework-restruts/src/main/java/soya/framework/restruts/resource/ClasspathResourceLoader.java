@@ -1,15 +1,17 @@
 package soya.framework.restruts.resource;
 
 import org.apache.commons.io.IOUtils;
-import soya.framework.restruts.NamespaceResourceLoader;
+import soya.framework.restruts.NamespaceAware;
 import soya.framework.restruts.Resource;
-import soya.framework.restruts.util.ConvertUtils;
+import soya.framework.restruts.ResourceException;
+import soya.framework.restruts.ResourceLoader;
+
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-public class ClasspathResourceLoader implements NamespaceResourceLoader {
+public class ClasspathResourceLoader implements NamespaceAware, ResourceLoader {
 
     private static final String CLASSPATH = "classpath:";
     public static final String[] NAMESPACES = {CLASSPATH};
@@ -20,36 +22,18 @@ public class ClasspathResourceLoader implements NamespaceResourceLoader {
     }
 
     @Override
-    public String getResource(String resource) {
-        try {
-            String path = resource.substring(CLASSPATH.length());
-            InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-            return IOUtils.toString(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public <T> T getResource(String url, Class<T> type) {
-        if (type == null || String.class.isAssignableFrom(type)) {
-            return (T) getResource(url);
-
-        } else if (Resource.class.isAssignableFrom(type)) {
-            return (T) new ClasspathResource(url.substring(CLASSPATH.length()));
-
-        } else {
-            return (T) ConvertUtils.convert(url, type);
-
-        }
-
+    public Resource load(String location) throws ResourceException {
+        return new ClasspathResource(location);
     }
 
     static class ClasspathResource implements Resource {
         private final String path;
 
-        ClasspathResource(String path) {
-            this.path = path;
+        ClasspathResource(String location) {
+            if(!location.startsWith(CLASSPATH)) {
+                throw new IllegalArgumentException("Illegal path format: " + location);
+            }
+            this.path = location.substring(CLASSPATH.length());
         }
 
         @Override
@@ -66,4 +50,5 @@ public class ClasspathResourceLoader implements NamespaceResourceLoader {
             return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
         }
     }
+
 }

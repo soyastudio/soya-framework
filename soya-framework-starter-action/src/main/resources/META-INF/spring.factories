@@ -1,0 +1,2 @@
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=soya.framework.action.springboot.ActionAutoConfiguration

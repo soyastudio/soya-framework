@@ -32,12 +32,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>soya.framework</groupId>
-            <artifactId>soya-framework-starter-gherkin</artifactId>
-            <version>${project.version}</version>
-        </dependency>-->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -53,6 +47,12 @@
         <dependency>
             <groupId>soya.framework</groupId>
             <artifactId>soya-framework-action</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-starter-action</artifactId>
             <version>${project.version}</version>
         </dependency>
 
