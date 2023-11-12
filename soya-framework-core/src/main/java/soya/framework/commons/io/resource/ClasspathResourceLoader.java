@@ -1,10 +1,10 @@
-package soya.framework.action.resource;
+package soya.framework.commons.io.resource;
 
 import org.apache.commons.io.IOUtils;
-import soya.framework.action.NamespaceAware;
-import soya.framework.action.Resource;
-import soya.framework.action.ResourceException;
-import soya.framework.action.ResourceLoader;
+import soya.framework.commons.io.NamespaceAware;
+import soya.framework.commons.io.Resource;
+import soya.framework.commons.io.ResourceException;
+import soya.framework.commons.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class ClasspathResourceLoader implements NamespaceAware, ResourceLoader {
         private final String path;
 
         ClasspathResource(String location) {
-            if(!location.startsWith(CLASSPATH)) {
+            if (!location.startsWith(CLASSPATH)) {
                 throw new IllegalArgumentException("Illegal path format: " + location);
             }
             this.path = location.substring(CLASSPATH.length());

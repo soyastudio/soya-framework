@@ -7,6 +7,12 @@ import java.util.Map;
 
 public abstract class DispatchAction<T> extends Action<T> {
 
+    protected DispatchAction() {
+    }
+
+    protected DispatchAction(ActionMapping mapping) {
+    }
+
     protected Map<String, DynaProperty> properties = new LinkedHashMap<>();
 
     public String[] getPropertyNames() {
@@ -23,6 +29,14 @@ public abstract class DispatchAction<T> extends Action<T> {
     public void setProperty(String name, Object value) {
         if (properties.containsKey(name)) {
             properties.get(name).setValue(value);
+        }
+    }
+
+    public Object getPropertyValue(String name) {
+        if (properties.containsKey(name)) {
+            return properties.get(name).getValue();
+        } else {
+            return null;
         }
     }
 

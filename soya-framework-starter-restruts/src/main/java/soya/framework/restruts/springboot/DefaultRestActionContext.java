@@ -2,6 +2,7 @@ package soya.framework.restruts.springboot;
 
 import org.springframework.context.ApplicationContext;
 import soya.framework.restruts.*;
+import soya.framework.restruts.io.GsonSerializer;
 import soya.framework.restruts.util.ConvertUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,6 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
     private List<ActionMapping> pathMappings = new ArrayList<>();
     private DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
     private Map<String, Serializer> serializerMap = new HashMap<>();
-
     private DefaultExceptionHandler exceptionHandler = new DefaultExceptionHandler();
 
     private String apiPath;
@@ -22,6 +22,7 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
 
     DefaultRestActionContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+        serializerMap.put(MediaType.APPLICATION_JSON, new GsonSerializer());
     }
 
     @Override
@@ -45,7 +46,13 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
 
     @Override
     public <T> T getService(String name, Class<T> type) {
-        return applicationContext.getBean(name, type);
+        if(name == null) {
+            return applicationContext.getBean(type);
+
+        } else {
+            return applicationContext.getBean(name, type);
+
+        }
     }
 
     @Override
@@ -60,9 +67,8 @@ class DefaultRestActionContext implements RestActionContext, DependentInjector {
         }
     }
 
-
     public Serializer getSerializer(String mediaType) {
-        String key = mediaType.toUpperCase();
+        String key = mediaType.toLowerCase();
         if (serializerMap.containsKey(key)) {
             return serializerMap.get(key);
         } else {

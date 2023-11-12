@@ -4,6 +4,7 @@ import soya.framework.restruts.DispatchAction;
 import soya.framework.restruts.RestAction;
 import soya.framework.restruts.util.ConvertUtils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -37,6 +38,16 @@ public abstract class ServiceDispatchAction<T> extends DispatchAction<T> {
         Object instance = getRestActionContext().getService(invoker.className);
         Method method = instance.getClass().getMethod(invoker.methodName, invoker.paramTypes);
 
+        properties.entrySet().forEach(e -> {
+            try {
+                Field field = getClass().getDeclaredField(e.getKey());
+                field.setAccessible(true);
+                e.getValue().setValue(field.get(this));
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
         return (T) method.invoke(instance, getArguments());
     }
 
@@ -51,7 +62,7 @@ public abstract class ServiceDispatchAction<T> extends DispatchAction<T> {
     static class ServiceInvoker {
         private String className;
         private String methodName;
-        private Class<?>[] paramTypes;
+        private Class<?>[] paramTypes = new Class[0];
         private Map<Integer, String> paramSettings = new HashMap<>();
 
         ServiceInvoker(String action) {
@@ -79,7 +90,7 @@ public abstract class ServiceDispatchAction<T> extends DispatchAction<T> {
                 className = token.substring(0, mark);
             }
 
-            if (parameterPart != null) {
+            if (parameterPart != null && parameterPart.trim().length() > 0) {
                 String[] params = parameterPart.split(",");
                 paramTypes = new Class[params.length];
                 for (int i = 0; i < params.length; i++) {

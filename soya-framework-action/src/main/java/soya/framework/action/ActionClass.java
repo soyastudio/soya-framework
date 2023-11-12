@@ -1,16 +1,12 @@
 package soya.framework.action;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import soya.framework.action.util.ConvertUtils;
 import soya.framework.action.util.ReflectUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -45,20 +41,21 @@ public final class ActionClass {
             Property property = propertyMap.get(e.name());
             property.set(e.type(), e.referredTo(), e.required(), e.description());
         });
-
-        if (registrations.containsKey(actionName)) {
-            throw new IllegalArgumentException("Action has already registered with name '" + actionName + "'.");
-        } else {
-            registrations.put(actionName, this);
-            logger.info("Registered action " + actionType.getName() + " as " + actionName);
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            logger.info(gson.toJson(forName(actionName).propertyMap));
-        }
     }
 
-    public static void register(Class<? extends Callable> cls) {
-        new ActionClass(cls);
+    public static ActionName register(Class<? extends Callable> cls) {
+        if (cls.getAnnotation(ActionDefinition.class) == null) {
+            throw new IllegalArgumentException("Class is not annotated as 'ActionDefinition': " + cls.getName());
+        }
+
+        ActionDefinition annotation = cls.getAnnotation(ActionDefinition.class);
+        ActionName actionName = ActionName.create(annotation.domain(), annotation.name());
+        if (!registrations.containsKey(actionName)) {
+            registrations.put(actionName, new ActionClass(cls));
+            return actionName;
+        }
+
+        return null;
     }
 
     public static ActionClass forName(ActionName actionName) {
@@ -69,15 +66,18 @@ public final class ActionClass {
         return registrations.get(actionName);
     }
 
-    public ActionExecutor<?> newInstance(ActionContext actionContext) {
+    public Action<?> newInstance(ActionContext actionContext) {
         try {
             Callable<?> instance = registrations.get(actionName).actionType.newInstance();
-            ActionExecutor<?> task = new ActionExecutor<>(instance);
+            Action<?> task = new Action<>(actionName, instance);
             propertyMap.values().forEach(p -> {
                 Field field = p.getField();
                 Object value = null;
                 if (p.type.equals(ActionParameterType.INPUT)) {
-                    task.addParameter(field, p.referredTo, p.required);
+                    task.addParameter(field, p.referredTo, p.required, true);
+
+                } else if (p.type.equals(ActionParameterType.PROPERTY)) {
+                    task.addParameter(field, p.referredTo, p.required, false);
 
                 } else if (p.type.equals(ActionParameterType.WIRED_SERVICE)) {
                     if (p.getReferredTo().trim().isEmpty()) {

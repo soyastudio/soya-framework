@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -93,6 +95,7 @@ public class ActionServlet extends HttpServlet {
                     contentType = "text/plain";
                 }
             }
+
             resp.setHeader("Content-Type", contentType);
             Serializer serializer = context.getSerializer(contentType);
 
@@ -120,10 +123,32 @@ public class ActionServlet extends HttpServlet {
     }
 
     private Callable<?> create(ActionMapping mapping, HttpServletRequest request) {
-        try {
-            Class<?> cls = mapping.getActionClass();
-            Callable<?> callable = (Callable<?>) cls.newInstance();
 
+        Class<?> cls = mapping.getActionClass();
+
+        Callable<?> callable = null;
+        Constructor[] constructors = cls.getConstructors();
+        Constructor constructor = constructors[0];
+
+        if(constructor.getParameters().length == 1
+                && constructor.getParameters()[0].getType().equals(ActionMapping.class)) {
+            try {
+                callable = (Callable<?>) constructor.newInstance(mapping);
+
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                callable = (Callable<?>) cls.newInstance();
+
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        try {
+            final Callable<?> task = callable;
             String accept = request.getHeader("accept");
             if (accept == null) {
                 if (mapping.getConsumes().length > 0) {
@@ -161,25 +186,25 @@ public class ActionServlet extends HttpServlet {
                     if (ParamType.WIRED_PROPERTY.equals(param.getParameterType())) {
                         String value = context.getProperty(param.getReferredTo());
                         try {
-                            f.set(callable, ConvertUtils.convert(value, fieldType));
+                            f.set(task, ConvertUtils.convert(value, fieldType));
                         } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
                     } else if (ParamType.WIRED_SERVICE.equals(param.getParameterType())) {
                         try {
-                            f.set(callable, context.getService(param.getReferredTo(), fieldType));
+                            f.set(task, context.getService(param.getReferredTo(), fieldType));
                         } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
                     } else if (ParamType.WIRED_RESOURCE.equals(param.getParameterType())) {
                         try {
-                            f.set(callable, context.getResource(param.getReferredTo(), fieldType));
+                            f.set(task, context.getResource(param.getReferredTo(), fieldType));
                         } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
                     } else if (ParamType.PAYLOAD.equals(param.getParameterType())) {
                         try {
-                            f.set(callable, getBody(request, fieldType, consume));
+                            f.set(task, getBody(request, fieldType, consume));
 
                         } catch (IllegalAccessException | IOException e) {
                             throw new RuntimeException(e);
@@ -189,7 +214,7 @@ public class ActionServlet extends HttpServlet {
                         if (mapping.isPathMapping()) {
                             String value = pathParams.get(param.getReferredTo());
                             try {
-                                f.set(callable, convert(value, fieldType));
+                                f.set(task, convert(value, fieldType));
                             } catch (IllegalAccessException e) {
                                 throw new RuntimeException(e);
                             }
@@ -198,7 +223,7 @@ public class ActionServlet extends HttpServlet {
                     } else {
                         String value = getParamValue(request, param.getReferredTo(), param.getParameterType());
                         try {
-                            f.set(callable, convert(value, fieldType));
+                            f.set(task, convert(value, fieldType));
                         } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
@@ -207,7 +232,7 @@ public class ActionServlet extends HttpServlet {
             });
 
             if (DispatchAction.class.isAssignableFrom(cls)) {
-                DispatchAction action = (DispatchAction) callable;
+                DispatchAction action = (DispatchAction) task;
 
                 Arrays.stream(action.getPropertyNames()).forEach(prop -> {
                     Class<?> propType = action.getPropertyType(prop);
@@ -239,7 +264,7 @@ public class ActionServlet extends HttpServlet {
                 });
             }
 
-            return callable;
+            return task;
 
         } catch (Exception ex) {
             throw new RuntimeException(ex);

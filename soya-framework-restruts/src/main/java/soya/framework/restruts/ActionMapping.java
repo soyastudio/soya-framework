@@ -137,7 +137,8 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
         }
 
         public Builder addParameter(String name, ParamType paramType, String referredTo, String desc) {
-            parameters.put(name, new ParameterMapping(name, paramType, referredTo, desc));
+            String ref = referredTo != null && !referredTo.isEmpty()? referredTo : name;
+            parameters.put(name, new ParameterMapping(name, paramType, ref, desc));
             return this;
         }
 
@@ -220,12 +221,12 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
 
         public boolean match(String path) {
             String[] items = path.split("/");
-            if(pathItems.length > items.length) {
+            if (pathItems.length > items.length) {
                 return false;
 
             } else {
-                for(int i = 0; i < pathItems.length; i ++) {
-                    if(!pathItems[i].equals(items[i]) && !pathItems[i].contains("{")) {
+                for (int i = 0; i < pathItems.length; i++) {
+                    if (!pathItems[i].equals(items[i]) && !pathItems[i].contains("{")) {
                         return false;
                     }
                 }
@@ -236,9 +237,9 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
         public Map<String, String> compile(String path) {
             Map<String, String> values = new HashMap<>();
             String[] items = path.split("/");
-            for(int i = 0; i < pathItems.length; i ++) {
+            for (int i = 0; i < pathItems.length; i++) {
                 String token = pathItems[i];
-                if(token.startsWith("{") && token.endsWith("}")) {
+                if (token.startsWith("{") && token.endsWith("}")) {
                     String key = token.substring(1, token.length() - 1);
                     values.put(key, items[i]);
                 }

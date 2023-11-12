@@ -1,14 +1,16 @@
 package soya.framework.spring.configuration;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import soya.framework.action.ActionRegistration;
+import soya.framework.action.rest.ActionRestAdapter;
 
 @Configuration
-public class RestConfiguration implements ApplicationContextAware {
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-
+public class RestConfiguration {
+    @Bean
+    ActionRestAdapter actionRestAdapter(@Autowired ActionRegistration actionRegistration) {
+        return new ActionRestAdapter(actionRegistration).exclude("jmx");
     }
+
 }

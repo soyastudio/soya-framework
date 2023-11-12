@@ -1,9 +1,9 @@
-package soya.framework.action.resource;
+package soya.framework.commons.io.resource;
 
 import org.apache.commons.io.IOUtils;
-import soya.framework.action.Resource;
-import soya.framework.action.ResourceException;
-import soya.framework.action.ResourceLoader;
+import soya.framework.commons.io.Resource;
+import soya.framework.commons.io.ResourceException;
+import soya.framework.commons.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;

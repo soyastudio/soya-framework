@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
         produces = "text/plain",
         tags = "Restruct"
 )
-
 public class GenericCallableDispatchAction extends ReflectAction {
 
     private String url;

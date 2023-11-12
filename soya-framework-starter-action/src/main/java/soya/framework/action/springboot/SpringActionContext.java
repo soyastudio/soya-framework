@@ -3,11 +3,11 @@ package soya.framework.action.springboot;
 import org.springframework.context.ApplicationContext;
 import soya.framework.action.ActionContext;
 
-public class DefaultActionContext implements ActionContext {
+public class SpringActionContext implements ActionContext {
 
     private ApplicationContext applicationContext;
 
-    public DefaultActionContext(ApplicationContext applicationContext) {
+    public SpringActionContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

@@ -61,11 +61,7 @@ public class RestrutsAutoConfiguration {
     @EventListener
     void onEvent(ApplicationStartedEvent event) {
         ApplicationContext context = event.getApplicationContext();
-
         DefaultRestActionContext ctx = context.getBean(DefaultRestActionContext.class);
-        context.getBeansOfType(RestActionLoader.class).entrySet().forEach(e -> {
-            ctx.register(e.getValue());
-        });
 
         // resource loaders:
         ctx.register(new ClasspathResourceLoader())
@@ -74,25 +70,15 @@ public class RestrutsAutoConfiguration {
             ctx.register(e.getValue());
         });
 
+        // scan for RestAction:
         if (properties.isAutoScan()) {
             DirectRestActionLoader loader = new DirectRestActionLoader();
             ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
             scanner.addIncludeFilter(new AnnotationTypeFilter(RestAction.class, true, true));
 
-
-            Map<String, RestActionDomain> domains = new HashMap<>();
-
             //
             if (properties.getScanPackages() != null) {
                 Arrays.stream(properties.getScanPackages().split(",")).forEach(pkg -> {
-                    try {
-                        Package pack = Class.forName(pkg + ".package-info").getPackage();
-                        RestActionDomain domain = pack.getAnnotation(RestActionDomain.class);
-                        System.out.println("============================ domain: " + domain);
-                    } catch (ClassNotFoundException e) {
-                        // throw new RuntimeException(e);
-                    }
-
                     Set<BeanDefinition> set = scanner.findCandidateComponents(pkg.trim());
                     set.forEach(e -> {
                         try {
@@ -111,7 +97,12 @@ public class RestrutsAutoConfiguration {
             });
         }
 
+        // Other loaders:
+        context.getBeansOfType(RestActionLoader.class).entrySet().forEach(e -> {
+            ctx.register(e.getValue());
+        });
 
+        // API Document
         if (properties.getSpecification().equalsIgnoreCase("SWAGGER")) {
             ctx.setApi(new SwaggerRenderer().render(ctx));
 

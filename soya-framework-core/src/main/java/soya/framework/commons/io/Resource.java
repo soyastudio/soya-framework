@@ -1,4 +1,4 @@
-package soya.framework.action;
+package soya.framework.commons.io;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
