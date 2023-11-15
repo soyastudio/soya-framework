@@ -36,15 +36,15 @@ public final class ActionDispatchAction extends DispatchAction<String> {
 
     @Override
     public String call() throws Exception {
-        Action action = actionClass.newInstance(actionContext());
+        ActionExecutor actionExecutor = actionClass.newInstance(actionContext());
         Arrays.stream(getPropertyNames()).forEach(pn -> {
             String value = (String) getPropertyValue(pn);
             if(value != null && value.trim().length() > 0) {
-                action.set(pn, value);
+                actionExecutor.set(pn, value);
             }
         });
 
-        Object result = action.execute();
+        Object result = actionExecutor.execute();
         if(result instanceof String) {
             return (String) result;
         } else {

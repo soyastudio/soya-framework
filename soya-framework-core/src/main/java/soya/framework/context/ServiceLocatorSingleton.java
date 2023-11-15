@@ -1,5 +1,8 @@
 package soya.framework.context;
 
+import soya.framework.commons.io.Resource;
+
+import java.net.URI;
 import java.util.Map;
 
 public abstract class ServiceLocatorSingleton implements ServiceLocator {
@@ -45,4 +48,15 @@ public abstract class ServiceLocatorSingleton implements ServiceLocator {
     public <T> Map<String, T> getServices(Class<T> type) throws ServiceLocateException {
         return locator.getServices(type);
     }
+
+    @Override
+    public String getProperty(String propName, boolean required) throws ServiceLocateException {
+        return locator.getProperty(propName, required);
+    }
+
+    @Override
+    public Resource getResource(URI uri) throws ServiceLocateException {
+        return locator.getResource(uri);
+    }
+
 }

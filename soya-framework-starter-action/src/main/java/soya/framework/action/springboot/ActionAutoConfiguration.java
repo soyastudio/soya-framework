@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import soya.framework.action.ActionContext;
-import soya.framework.action.ActionExecutor;
-import soya.framework.action.DefaultActionExecutor;
 
 @Configuration
 @EnableConfigurationProperties(ActionProperties.class)
@@ -28,11 +26,6 @@ public class ActionAutoConfiguration {
     ActionContext actionContext(ApplicationContext applicationContext) {
         this.actionContext = new SpringActionContext(applicationContext);
         return actionContext;
-    }
-
-    @Bean
-    ActionExecutor actionExecutor(ActionContext actionContext) {
-        return new DefaultActionExecutor(actionContext);
     }
 
     @Bean

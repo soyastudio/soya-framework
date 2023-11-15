@@ -41,6 +41,7 @@ public class DirectRestActionLoader implements RestActionLoader {
                 builder.addParameter(p.name(),
                         p.paramType(),
                         p.referredTo().isEmpty() ? p.name() : p.referredTo(),
+                        p.required(),
                         p.description());
             });
 

@@ -8,14 +8,15 @@ import soya.framework.commons.io.ResourceLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 
 public class URLResourceLoader implements ResourceLoader {
     @Override
-    public Resource load(String url) throws ResourceException {
+    public Resource load(URI uri) throws ResourceException {
         try {
-            return new URLResource(new URL(url));
+            return new URLResource(uri.toURL());
 
         } catch (MalformedURLException e) {
             throw new ResourceException(e);

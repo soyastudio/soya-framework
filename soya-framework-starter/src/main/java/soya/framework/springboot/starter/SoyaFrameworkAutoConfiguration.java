@@ -3,14 +3,17 @@ package soya.framework.springboot.starter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import soya.framework.commons.io.Resource;
 import soya.framework.context.Container;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
@@ -58,55 +61,6 @@ public class SoyaFrameworkAutoConfiguration {
             //System.out.printf("Component: %s\n", component.getBeanClassName());
         }
 
-        new ApplicationContextServiceLocator(new ServiceLocator() {
-            @Override
-            public String[] serviceNames() {
-                return applicationContext.getBeanDefinitionNames();
-            }
-
-            @Override
-            public Object getService(String name) throws ServiceLocateException {
-                try {
-                    return applicationContext.getBean(name);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for name: " + name + ".", e);
-                }
-            }
-
-            @Override
-            public <T> T getService(Class<T> type) {
-                try {
-                    return applicationContext.getBean(type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + ".", e);
-                }
-
-            }
-
-            @Override
-            public <T> T getService(String name, Class<T> type) {
-                try {
-                    return applicationContext.getBean(name, type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + " with name: " + name + ".", e);
-                }
-            }
-
-            @Override
-            public <T> Map<String, T> getServices(Class<T> type) {
-                try {
-                    return applicationContext.getBeansOfType(type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + ".", e);
-                }
-
-            }
-        });
-
 
         /*Set<String> packages = new LinkedHashSet<>();
         if (properties.getScanPackages() != null) {
@@ -121,59 +75,13 @@ public class SoyaFrameworkAutoConfiguration {
         new DefaultActionContext(this);*/
     }
 
-    @Bean
-    public ServiceLocator getServiceLocator() {
-        return new ApplicationContextServiceLocator(new ServiceLocator() {
-            @Override
-            public String[] serviceNames() {
-                return applicationContext.getBeanDefinitionNames();
-            }
-
-            @Override
-            public Object getService(String name) throws ServiceLocateException {
-                try {
-                    return applicationContext.getBean(name);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for name: " + name + ".", e);
-                }
-            }
-
-            @Override
-            public <T> T getService(Class<T> type) {
-                try {
-                    return applicationContext.getBean(type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + ".", e);
-                }
-
-            }
-
-            @Override
-            public <T> T getService(String name, Class<T> type) {
-                try {
-                    return applicationContext.getBean(name, type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + " with name: " + name + ".", e);
-                }
-            }
-
-            @Override
-            public <T> Map<String, T> getServices(Class<T> type) {
-                try {
-                    return applicationContext.getBeansOfType(type);
-
-                } catch (BeansException e) {
-                    throw new ServiceLocateException("Service not available for type: " + type.getName() + ".", e);
-                }
-            }
-        });
+    @EventListener
+    public void onEvent(ApplicationStartedEvent event) {
+        new SingletonServiceLocator(new ApplicationContextServiceLocator(event.getApplicationContext()));
     }
 
-    static class ApplicationContextServiceLocator extends ServiceLocatorSingleton {
-        protected ApplicationContextServiceLocator(ServiceLocator locator) {
+    static class SingletonServiceLocator extends ServiceLocatorSingleton {
+        protected SingletonServiceLocator(ServiceLocator locator) {
             super(locator);
         }
     }

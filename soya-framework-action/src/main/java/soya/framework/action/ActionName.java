@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.Objects;
 
 public final class ActionName implements Comparable<ActionName>, Serializable {
-
     private final String domain;
     private final String name;
 

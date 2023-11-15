@@ -136,9 +136,9 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
             return this;
         }
 
-        public Builder addParameter(String name, ParamType paramType, String referredTo, String desc) {
+        public Builder addParameter(String name, ParamType paramType, String referredTo, boolean required, String desc) {
             String ref = referredTo != null && !referredTo.isEmpty()? referredTo : name;
-            parameters.put(name, new ParameterMapping(name, paramType, ref, desc));
+            parameters.put(name, new ParameterMapping(name, paramType, ref, required, desc));
             return this;
         }
 
@@ -276,12 +276,15 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
 
         private final String referredTo;
 
+        private final boolean required;
+
         private final String description;
 
-        public ParameterMapping(String name, ParamType actionParameterType, String referredTo, String description) {
+        public ParameterMapping(String name, ParamType actionParameterType, String referredTo, boolean required, String description) {
             this.name = name;
             this.actionParameterType = actionParameterType;
             this.referredTo = referredTo;
+            this.required = required;
             this.description = description;
         }
 
@@ -295,6 +298,10 @@ public class ActionMapping implements Comparable<ActionMapping>, Serializable {
 
         public String getReferredTo() {
             return referredTo;
+        }
+
+        public boolean isRequired() {
+            return required;
         }
 
         public String getDescription() {

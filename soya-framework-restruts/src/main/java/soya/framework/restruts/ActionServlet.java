@@ -177,6 +177,7 @@ public class ActionServlet extends HttpServlet {
                     param = new ActionMapping.ParameterMapping(annotation.name(),
                             annotation.paramType(),
                             annotation.referredTo().isEmpty() ? annotation.name() : annotation.referredTo(),
+                            annotation.required(),
                             annotation.description());
                 }
 
@@ -244,7 +245,14 @@ public class ActionServlet extends HttpServlet {
                             action.setProperty(prop, ConvertUtils.convert(value, propType));
 
                         } else if (ParamType.WIRED_SERVICE.equals(parameterMapping.getParameterType())) {
-                            action.setProperty(prop, context.getService(parameterMapping.getReferredTo(), propType));
+                            try {
+                                action.setProperty(prop, context.getService(parameterMapping.getReferredTo(), propType));
+
+                            } catch (RuntimeException ex) {
+                                if(parameterMapping.isRequired()) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
 
                         } else if (ParamType.WIRED_RESOURCE.equals(parameterMapping.getParameterType())) {
                             action.setProperty(prop, context.getResource(parameterMapping.getReferredTo(), propType));

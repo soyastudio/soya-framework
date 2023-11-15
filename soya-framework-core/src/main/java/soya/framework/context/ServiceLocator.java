@@ -1,6 +1,9 @@
 package soya.framework.context;
 
-import java.util.*;
+import soya.framework.commons.io.Resource;
+
+import java.net.URI;
+import java.util.Map;
 
 public interface ServiceLocator {
     String[] serviceNames();
@@ -12,5 +15,9 @@ public interface ServiceLocator {
     <T> T getService(String name, Class<T> type) throws ServiceLocateException;
 
     <T> Map<String, T> getServices(Class<T> type) throws ServiceLocateException;
+
+    String getProperty(String propName, boolean required) throws ServiceLocateException;
+
+    Resource getResource(URI uri) throws ServiceLocateException;
 }
 

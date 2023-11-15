@@ -8,11 +8,12 @@ import soya.framework.commons.io.ResourceLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 
 public class ClasspathResourceLoader implements NamespaceAware, ResourceLoader {
 
-    private static final String CLASSPATH = "classpath:";
+    public static final String CLASSPATH = "classpath";
     public static final String[] NAMESPACES = {CLASSPATH};
 
     @Override
@@ -21,18 +22,19 @@ public class ClasspathResourceLoader implements NamespaceAware, ResourceLoader {
     }
 
     @Override
-    public Resource load(String location) throws ResourceException {
-        return new ClasspathResource(location);
+    public Resource load(URI uri) throws ResourceException {
+        return new ClasspathResource(uri);
     }
 
     static class ClasspathResource implements Resource {
         private final String path;
 
-        ClasspathResource(String location) {
-            if (!location.startsWith(CLASSPATH)) {
-                throw new IllegalArgumentException("Illegal path format: " + location);
+        ClasspathResource(URI uri) {
+            String location = uri.getSchemeSpecificPart();
+            if (location.contains("?")) {
+                location = location.substring(0, location.indexOf('?'));
             }
-            this.path = location.substring(CLASSPATH.length());
+            this.path = location;
         }
 
         @Override

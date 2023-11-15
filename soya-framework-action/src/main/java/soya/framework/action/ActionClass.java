@@ -66,10 +66,10 @@ public final class ActionClass {
         return registrations.get(actionName);
     }
 
-    public Action<?> newInstance(ActionContext actionContext) {
+    public ActionExecutor<?> newInstance(ActionContext actionContext) {
         try {
             Callable<?> instance = registrations.get(actionName).actionType.newInstance();
-            Action<?> task = new Action<>(actionName, instance);
+            ActionExecutor<?> task = new ActionExecutor<>(actionName, instance);
             propertyMap.values().forEach(p -> {
                 Field field = p.getField();
                 Object value = null;
@@ -80,10 +80,18 @@ public final class ActionClass {
                     task.addParameter(field, p.referredTo, p.required, false);
 
                 } else if (p.type.equals(ActionParameterType.WIRED_SERVICE)) {
-                    if (p.getReferredTo().trim().isEmpty()) {
-                        value = actionContext.getService(null, field.getType());
-                    } else {
-                        value = actionContext.getService(p.getReferredTo(), field.getType());
+                    try {
+                        if (p.getReferredTo().trim().isEmpty()) {
+                            value = actionContext.getService(null, field.getType());
+                        } else {
+                            value = actionContext.getService(p.getReferredTo(), field.getType());
+                        }
+
+                    } catch (ServiceNotFoundException ex) {
+                        if(p.isRequired()) {
+                            throw new RuntimeException(ex);
+                        }
+
                     }
 
                 } else if (p.type.equals(ActionParameterType.WIRED_PROPERTY)) {

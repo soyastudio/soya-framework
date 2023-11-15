@@ -32,7 +32,7 @@ public class ActionRestAdapter implements RestActionLoader {
     public Set<ActionMapping> load() {
         Set<ActionMapping> set = new HashSet<>();
         Arrays.stream(actionRegistration.actions(null)).forEach(e -> {
-            if(!excludes.contains(e.getDomain())) {
+            if (!excludes.contains(e.getDomain())) {
                 set.add(map(actionRegistration.actionType(e)));
             }
         });
@@ -60,12 +60,20 @@ public class ActionRestAdapter implements RestActionLoader {
                     && !Modifier.isFinal(field.getModifiers())
                     && field.getAnnotation(ActionParameter.class) != null) {
                 ActionParameter parameter = field.getAnnotation(ActionParameter.class);
-                builder.addParameter(field.getName(), getParamType(parameter.type()), parameter.referredTo(), parameter.description());
+                builder.addParameter(field.getName(),
+                        getParamType(parameter.type()),
+                        parameter.referredTo(),
+                        parameter.required(),
+                        parameter.description());
             }
         });
 
         Arrays.stream(annotation.parameters()).forEach(param -> {
-            builder.addParameter(param.name(), getParamType(param.type()), param.referredTo(), param.description());
+            builder.addParameter(param.name(),
+                    getParamType(param.type()),
+                    param.referredTo(),
+                    param.required(),
+                    param.description());
         });
 
         return builder.create();
@@ -94,7 +102,7 @@ public class ActionRestAdapter implements RestActionLoader {
         String st = domain.replace(".", "_");
         StringTokenizer tokenizer = new StringTokenizer(st, "_");
         StringBuilder builder = new StringBuilder("Soya");
-        while(tokenizer.hasMoreTokens()) {
+        while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             builder.append(" ")
                     .append(Character.toUpperCase(token.charAt(0)))

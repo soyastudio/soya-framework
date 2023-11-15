@@ -10,7 +10,7 @@ import soya.framework.action.rest.ActionRestAdapter;
 public class RestConfiguration {
     @Bean
     ActionRestAdapter actionRestAdapter(@Autowired ActionRegistration actionRegistration) {
-        return new ActionRestAdapter(actionRegistration).exclude("jmx");
+        return new ActionRestAdapter(actionRegistration);
     }
 
 }

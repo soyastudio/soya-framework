@@ -12,6 +12,8 @@ public @interface RestActionParameter {
 
     String referredTo() default "";
 
+    boolean required() default false;
+
     String description() default "";
 
 }

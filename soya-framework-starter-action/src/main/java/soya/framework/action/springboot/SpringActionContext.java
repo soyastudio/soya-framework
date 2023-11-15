@@ -2,6 +2,7 @@ package soya.framework.action.springboot;
 
 import org.springframework.context.ApplicationContext;
 import soya.framework.action.ActionContext;
+import soya.framework.action.ServiceNotFoundException;
 
 public class SpringActionContext implements ActionContext {
 
@@ -17,16 +18,25 @@ public class SpringActionContext implements ActionContext {
     }
 
     @Override
-    public Object getService(String name) {
-        return applicationContext.getBean(name);
+    public Object getService(String name) throws ServiceNotFoundException {
+        try {
+            return applicationContext.getBean(name);
+
+        } catch (Exception e) {
+            throw new ServiceNotFoundException(e);
+        }
     }
 
     @Override
-    public <T> T getService(String name, Class<T> type) {
-        if(name == null) {
-            return applicationContext.getBean(type);
-        } else {
-            return applicationContext.getBean(name, type);
+    public <T> T getService(String name, Class<T> type) throws ServiceNotFoundException {
+        try {
+            if (name == null) {
+                return applicationContext.getBean(type);
+            } else {
+                return applicationContext.getBean(name, type);
+            }
+        } catch (Exception e) {
+            throw new ServiceNotFoundException(e);
         }
     }
 
