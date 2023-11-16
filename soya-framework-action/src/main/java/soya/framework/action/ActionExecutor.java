@@ -10,9 +10,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public final class ActionExecutor<T> {
+
     private final ActionName actionName;
+
     private Callable<T> callable;
-    private Map<String, Parameter> parameters = new LinkedHashMap<>();
+    private Map<String, ParameterSetter> parameters = new LinkedHashMap<>();
 
     private String inputParamName;
 
@@ -80,16 +82,17 @@ public final class ActionExecutor<T> {
         if(input && this.inputParamName == null) {
             this.inputParamName = field.getName();
         }
-        parameters.put(field.getName(), new Parameter(field, ref, required));
+        parameters.put(field.getName(), new ParameterSetter(field, ref, required));
     }
 
-    static class Parameter {
+    static class ParameterSetter {
         private final Field field;
         private final String referredTo;
         private final boolean required;
+
         private Object value;
 
-        Parameter(Field field, String referredTo, boolean required) {
+        ParameterSetter(Field field, String referredTo, boolean required) {
             this.field = field;
             this.referredTo = referredTo;
             this.required = required;

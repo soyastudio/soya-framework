@@ -30,4 +30,30 @@ public final class ReflectUtils {
         }
         return fieldMap.values().toArray(new Field[fieldMap.size()]);
     }
+
+    public static Field getField(String name, Class<?> cls) {
+        Field field = null;
+        Class<?> clazz = cls;
+
+        while(field == null) {
+            if(clazz.equals(Object.class)) {
+                break;
+            }
+
+            try {
+                field = clazz.getDeclaredField(name);
+                clazz = clazz.getSuperclass();
+
+            } catch (NoSuchFieldException e) {
+
+            }
+        }
+
+        if(field == null) {
+            throw new RuntimeException(
+                    new NoSuchFieldException("No such field '" + name + "' for class " + cls.getName()));
+        }
+
+        return field;
+    }
 }

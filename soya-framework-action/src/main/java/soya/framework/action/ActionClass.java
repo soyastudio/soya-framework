@@ -13,12 +13,14 @@ import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 public final class ActionClass {
+
     private static Logger logger = Logger.getLogger(ActionClass.class.getName());
     private static Map<ActionName, ActionClass> registrations = new LinkedHashMap<>();
+
     private final ActionName actionName;
     private final Class<? extends Callable> actionType;
 
-    private Map<String, Property> propertyMap = new LinkedHashMap<>();
+    private Map<String, Parameter> propertyMap = new LinkedHashMap<>();
 
     private ActionClass(Class<? extends Callable> actionType) {
         ActionDefinition annotation = actionType.getAnnotation(ActionDefinition.class);
@@ -28,20 +30,25 @@ public final class ActionClass {
         this.actionName = new ActionName(annotation.domain(), annotation.name());
         this.actionType = actionType;
 
-        Field[] fields = ReflectUtils.getFields(actionType);
-        Arrays.stream(fields).forEach(field -> {
-            if (!Modifier.isFinal(field.getModifiers())
-                    && !Modifier.isStatic(field.getModifiers())) {
-                propertyMap.put(field.getName(), new Property(field));
+        // From ActionDefinition annotation:
+        Arrays.stream(annotation.parameters()).forEach(e -> {
+            if (propertyMap.containsKey(e.name())) {
+                throw new IllegalArgumentException("");
             }
+
+            Field field = ReflectUtils.getField(e.name(), actionType);
+            Parameter property = new Parameter(field, e);
+            propertyMap.put(e.name(), property);
         });
 
-        Arrays.stream(annotation.parameters()).forEach(e -> {
-            if (!propertyMap.containsKey(e.name())) {
-                throw new IllegalArgumentException();
+        Field[] fields = ReflectUtils.getFields(actionType);
+        Arrays.stream(fields).forEach(field -> {
+            if (!propertyMap.containsKey(field.getName())
+                    && !Modifier.isFinal(field.getModifiers())
+                    && !Modifier.isStatic(field.getModifiers())
+                    && field.getAnnotation(ActionParameter.class) != null) {
+                propertyMap.put(field.getName(), new Parameter(field));
             }
-            Property property = propertyMap.get(e.name());
-            property.set(e.type(), e.referredTo(), e.required(), e.description());
         });
     }
 
@@ -126,25 +133,29 @@ public final class ActionClass {
         }
     }
 
-    static class Property implements Serializable {
+    static class Parameter implements Serializable {
         private final transient Field field;
 
         private ActionParameterType type;
-
         private String referredTo;
-
         private boolean required;
-
         private String description;
 
-        Property(Field field) {
+        Parameter(Field field, ActionParameter annotation) {
             this.field = field;
-            ActionParameter parameter = field.getAnnotation(ActionParameter.class);
-            if (parameter != null) {
-                set(parameter.type(), parameter.referredTo(), parameter.required(), parameter.description());
-            } else {
-                set(ActionParameterType.INPUT, "", false, "");
-            }
+            set(annotation.type(),
+                    annotation.referredTo(),
+                    annotation.required(),
+                    annotation.description());
+        }
+
+        Parameter(Field field) {
+            this.field = field;
+            ActionParameter annotation = field.getAnnotation(ActionParameter.class);
+            set(annotation.type(),
+                    annotation.referredTo(),
+                    annotation.required(),
+                    annotation.description());
         }
 
         void set(ActionParameterType type,
@@ -177,5 +188,6 @@ public final class ActionClass {
             return description;
         }
     }
+
 
 }
