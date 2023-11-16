@@ -6,7 +6,9 @@ import soya.framework.action.util.ReflectUtils;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -70,6 +72,7 @@ public final class ActionClass {
         try {
             Callable<?> instance = registrations.get(actionName).actionType.newInstance();
             ActionExecutor<?> task = new ActionExecutor<>(actionName, instance);
+
             propertyMap.values().forEach(p -> {
                 Field field = p.getField();
                 Object value = null;
@@ -88,7 +91,7 @@ public final class ActionClass {
                         }
 
                     } catch (ServiceNotFoundException ex) {
-                        if(p.isRequired()) {
+                        if (p.isRequired()) {
                             throw new RuntimeException(ex);
                         }
 

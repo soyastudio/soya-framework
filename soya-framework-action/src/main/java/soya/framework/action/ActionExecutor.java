@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public final class ActionExecutor<T> {
-
     private final ActionName actionName;
     private Callable<T> callable;
     private Map<String, Parameter> parameters = new LinkedHashMap<>();
