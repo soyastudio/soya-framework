@@ -23,7 +23,6 @@ public abstract class ServiceLocatorSingleton implements ServiceLocator {
         return me;
     }
 
-
     @Override
     public String[] serviceNames() {
         return locator.serviceNames();
@@ -50,8 +49,8 @@ public abstract class ServiceLocatorSingleton implements ServiceLocator {
     }
 
     @Override
-    public String getProperty(String propName, boolean required) throws ServiceLocateException {
-        return locator.getProperty(propName, required);
+    public String getProperty(String propName) throws ServiceLocateException {
+        return locator.getProperty(propName);
     }
 
     @Override

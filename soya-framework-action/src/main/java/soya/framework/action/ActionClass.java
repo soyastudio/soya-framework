@@ -1,7 +1,6 @@
 package soya.framework.action;
 
-import soya.framework.action.util.ConvertUtils;
-import soya.framework.action.util.ReflectUtils;
+import soya.framework.commons.util.ReflectUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -15,12 +14,14 @@ import java.util.logging.Logger;
 public final class ActionClass {
 
     private static Logger logger = Logger.getLogger(ActionClass.class.getName());
+
     private static Map<ActionName, ActionClass> registrations = new LinkedHashMap<>();
 
     private final ActionName actionName;
+
     private final Class<? extends Callable> actionType;
 
-    private Map<String, Parameter> propertyMap = new LinkedHashMap<>();
+    private Map<String, Parameter> params = new LinkedHashMap<>();
 
     private ActionClass(Class<? extends Callable> actionType) {
         ActionDefinition annotation = actionType.getAnnotation(ActionDefinition.class);
@@ -32,24 +33,40 @@ public final class ActionClass {
 
         // From ActionDefinition annotation:
         Arrays.stream(annotation.parameters()).forEach(e -> {
-            if (propertyMap.containsKey(e.name())) {
+            if (params.containsKey(e.name())) {
                 throw new IllegalArgumentException("");
             }
 
             Field field = ReflectUtils.getField(e.name(), actionType);
             Parameter property = new Parameter(field, e);
-            propertyMap.put(e.name(), property);
+            params.put(e.name(), property);
         });
 
         Field[] fields = ReflectUtils.getFields(actionType);
         Arrays.stream(fields).forEach(field -> {
-            if (!propertyMap.containsKey(field.getName())
+            if (!params.containsKey(field.getName())
                     && !Modifier.isFinal(field.getModifiers())
                     && !Modifier.isStatic(field.getModifiers())
                     && field.getAnnotation(ActionParameter.class) != null) {
-                propertyMap.put(field.getName(), new Parameter(field));
+                params.put(field.getName(), new Parameter(field));
             }
         });
+    }
+
+    public ActionName getActionName() {
+        return actionName;
+    }
+
+    public Class<? extends Callable> getActionType() {
+        return actionType;
+    }
+
+    Parameter[] parameters() {
+        return params.values().toArray(new Parameter[params.size()]);
+    }
+
+    Parameter getParameter(String name) {
+        return params.get(name);
     }
 
     public static ActionName register(Class<? extends Callable> cls) {
@@ -63,7 +80,6 @@ public final class ActionClass {
             registrations.put(actionName, new ActionClass(cls));
             return actionName;
         }
-
         return null;
     }
 
@@ -76,11 +92,14 @@ public final class ActionClass {
     }
 
     public ActionExecutor<?> newInstance(ActionContext actionContext) {
+        return new ActionExecutor<>(this, actionContext);
+
+/*
         try {
             Callable<?> instance = registrations.get(actionName).actionType.newInstance();
             ActionExecutor<?> task = new ActionExecutor<>(actionName, instance);
 
-            propertyMap.values().forEach(p -> {
+            params.values().forEach(p -> {
                 Field field = p.getField();
                 Object value = null;
                 if (p.type.equals(ActionParameterType.INPUT)) {
@@ -130,7 +149,7 @@ public final class ActionClass {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
 
-        }
+        }*/
     }
 
     static class Parameter implements Serializable {
@@ -188,6 +207,5 @@ public final class ActionClass {
             return description;
         }
     }
-
 
 }

@@ -1,16 +1,21 @@
-package soya.framework.restruts.annotation;
+package soya.framework.restruts.oas;
 
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 @Documented
 public @interface Operation {
-    String id() default "";
+    String path();
 
-    String summary() default "";
+    String method();
+
+    String id() default "";
 
     String description() default "";
 
+    Parameter[] parameters() default {};
 
+    Extension[] extensions() default {};
 }

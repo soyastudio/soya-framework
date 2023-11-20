@@ -4,7 +4,7 @@ import soya.framework.action.ActionDefinition;
 import soya.framework.action.ActionParameter;
 import soya.framework.action.ActionParameterType;
 import soya.framework.action.ActionRegistration;
-import soya.framework.action.util.ReflectUtils;
+import soya.framework.commons.util.ReflectUtils;
 import soya.framework.restruts.*;
 
 import java.lang.reflect.Modifier;
@@ -60,20 +60,26 @@ public class ActionRestAdapter implements RestActionLoader {
                     && !Modifier.isFinal(field.getModifiers())
                     && field.getAnnotation(ActionParameter.class) != null) {
                 ActionParameter parameter = field.getAnnotation(ActionParameter.class);
-                builder.addParameter(field.getName(),
-                        getParamType(parameter.type()),
-                        parameter.referredTo(),
-                        parameter.required(),
-                        parameter.description());
+                if(!parameter.type().isWired()) {
+                    builder.addParameter(field.getName(),
+                            getParamType(parameter.type()),
+                            parameter.referredTo(),
+                            parameter.required(),
+                            parameter.description());
+
+                }
             }
         });
 
         Arrays.stream(annotation.parameters()).forEach(param -> {
-            builder.addParameter(param.name(),
-                    getParamType(param.type()),
-                    param.referredTo(),
-                    param.required(),
-                    param.description());
+            if(!param.type().isWired()) {
+                builder.addParameter(param.name(),
+                        getParamType(param.type()),
+                        param.referredTo(),
+                        param.required(),
+                        param.description());
+
+            }
         });
 
         return builder.create();
@@ -81,15 +87,6 @@ public class ActionRestAdapter implements RestActionLoader {
 
     private ParamType getParamType(ActionParameterType apt) {
         switch (apt) {
-            case WIRED_SERVICE:
-                return ParamType.WIRED_SERVICE;
-
-            case WIRED_PROPERTY:
-                return ParamType.WIRED_PROPERTY;
-
-            case WIRED_RESOURCE:
-                return ParamType.WIRED_RESOURCE;
-
             case INPUT:
                 return ParamType.PAYLOAD;
 

@@ -1,47 +1,75 @@
 package soya.framework.action.springboot;
 
-import org.springframework.context.ApplicationContext;
 import soya.framework.action.ActionContext;
-import soya.framework.action.ServiceNotFoundException;
+import soya.framework.action.NotFoundException;
+import soya.framework.action.util.ConvertUtils;
+import soya.framework.commons.io.Resource;
+import soya.framework.context.ServiceLocator;
+import soya.framework.context.ServiceLocatorSingleton;
+
+import java.lang.reflect.ParameterizedType;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 
 public class SpringActionContext implements ActionContext {
 
-    private ApplicationContext applicationContext;
-
-    public SpringActionContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
-
     @Override
-    public String getProperty(String propName) {
-        return applicationContext.getEnvironment().getProperty(propName);
-    }
-
-    @Override
-    public Object getService(String name) throws ServiceNotFoundException {
-        try {
-            return applicationContext.getBean(name);
-
-        } catch (Exception e) {
-            throw new ServiceNotFoundException(e);
+    public String getProperty(String propName, boolean required) throws NotFoundException {
+        String property = serviceLocator().getProperty(propName);
+        if (property == null && required) {
+            throw new NotFoundException("");
         }
+        return property;
     }
 
     @Override
-    public <T> T getService(String name, Class<T> type) throws ServiceNotFoundException {
+    public <T> T getService(String name, Class<T> type) throws NotFoundException {
         try {
-            if (name == null) {
-                return applicationContext.getBean(type);
+            if (name == null || name.isEmpty()) {
+                return serviceLocator().getService(type);
             } else {
-                return applicationContext.getBean(name, type);
+                return serviceLocator().getService(name, type);
             }
         } catch (Exception e) {
-            throw new ServiceNotFoundException(e);
+            throw new NotFoundException(e);
         }
     }
 
     @Override
     public <T> T getResource(String url, Class<T> type) {
-        return null;
+        ServiceLocator locator = ServiceLocatorSingleton.getInstance();
+        try {
+            Resource resource = locator.getResource(new URI(url));
+            if (type.isInstance(resource)) {
+                return (T) resource;
+
+            } else if (String.class.isAssignableFrom(type)) {
+                return (T) resource.getAsString(Charset.defaultCharset());
+
+            } else if (loadable(resource.getClass(), type)) {
+                return (T) resource.get();
+
+            } else {
+                return (T) ConvertUtils.convert(resource.getAsString(Charset.defaultCharset()), type);
+
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean loadable(Class<? extends Resource> resourceType, Class<?> dataType) {
+        if (((ParameterizedType) resourceType.getGenericSuperclass())
+                .getActualTypeArguments().length > 0) {
+            Class<?> parameterizedType = (Class<?>) ((ParameterizedType) resourceType.getGenericSuperclass())
+                    .getActualTypeArguments()[0];
+            return dataType.isAssignableFrom(parameterizedType);
+        }
+        return false;
+    }
+
+    private ServiceLocator serviceLocator() {
+        return ServiceLocatorSingleton.getInstance();
     }
 }

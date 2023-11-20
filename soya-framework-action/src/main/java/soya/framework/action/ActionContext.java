@@ -1,12 +1,10 @@
 package soya.framework.action;
 
 public interface ActionContext {
-    String getProperty(String propName);
+    String getProperty(String propName, boolean required) throws NotFoundException;
 
-    Object getService(String name) throws ServiceNotFoundException;
+    <T> T getService(String name, Class<T> type) throws NotFoundException;
 
-    <T> T getService(String name, Class<T> type) throws ServiceNotFoundException;
-
-    <T> T getResource(String url, Class<T> type);
+    <T> T getResource(String url, Class<T> type) throws NotFoundException;
 
 }

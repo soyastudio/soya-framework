@@ -16,7 +16,7 @@ public interface ServiceLocator {
 
     <T> Map<String, T> getServices(Class<T> type) throws ServiceLocateException;
 
-    String getProperty(String propName, boolean required) throws ServiceLocateException;
+    String getProperty(String propName) throws ServiceLocateException;
 
     Resource getResource(URI uri) throws ServiceLocateException;
 }

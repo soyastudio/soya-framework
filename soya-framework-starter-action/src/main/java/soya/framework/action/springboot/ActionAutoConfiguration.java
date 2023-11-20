@@ -23,8 +23,8 @@ public class ActionAutoConfiguration {
     private DefaultActionRegistration registration;
 
     @Bean
-    ActionContext actionContext(ApplicationContext applicationContext) {
-        this.actionContext = new SpringActionContext(applicationContext);
+    ActionContext actionContext() {
+        this.actionContext = new SpringActionContext();
         return actionContext;
     }
 

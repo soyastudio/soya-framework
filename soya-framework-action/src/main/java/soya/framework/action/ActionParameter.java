@@ -12,6 +12,8 @@ public @interface ActionParameter {
 
     String referredTo() default "";
 
+    int order() default 5;
+
     boolean required() default false;
 
     String description() default "";

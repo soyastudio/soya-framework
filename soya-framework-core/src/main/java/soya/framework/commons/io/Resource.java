@@ -1,10 +1,12 @@
 package soya.framework.commons.io;
 
-import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 
-public interface Resource {
-    InputStream getAsInputStream() throws ResourceException;
+public interface Resource<T> {
+    URI getURI();
+
+    T get() throws ResourceException;
 
     String getAsString(Charset encoding) throws ResourceException;
 }

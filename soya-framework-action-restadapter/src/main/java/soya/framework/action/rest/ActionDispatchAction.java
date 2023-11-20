@@ -18,6 +18,7 @@ public final class ActionDispatchAction extends DispatchAction<String> {
 
     public ActionDispatchAction(ActionMapping mapping) {
         super(mapping);
+
         try {
             actionClass = ActionClass.forName(ActionName.fromURI(new URI(mapping.getAction())));
             Arrays.stream(mapping.getParameters()).forEach(p -> {

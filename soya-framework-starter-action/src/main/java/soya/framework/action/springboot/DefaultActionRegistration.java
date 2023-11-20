@@ -4,7 +4,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import soya.framework.action.*;
-import soya.framework.action.util.ReflectUtils;
+import soya.framework.commons.util.ReflectUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;

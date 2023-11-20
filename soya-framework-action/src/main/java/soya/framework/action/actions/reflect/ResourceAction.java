@@ -3,6 +3,7 @@ package soya.framework.action.actions.reflect;
 import soya.framework.action.ActionDefinition;
 import soya.framework.action.ActionParameter;
 import soya.framework.action.ActionParameterType;
+import soya.framework.commons.io.Resource;
 import soya.framework.context.ServiceLocatorSingleton;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ public class ResourceAction implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        return ServiceLocatorSingleton.getInstance().getResource(new URI(uri)).getAsString(Charset.defaultCharset());
+        Resource resource = ServiceLocatorSingleton.getInstance().getResource(new URI(uri));
+        return resource.getAsString(Charset.defaultCharset());
     }
 }

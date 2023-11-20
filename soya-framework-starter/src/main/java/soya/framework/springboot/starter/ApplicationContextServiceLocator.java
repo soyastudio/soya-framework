@@ -5,7 +5,9 @@ import org.springframework.context.ApplicationContext;
 import soya.framework.commons.io.NamespaceAware;
 import soya.framework.commons.io.Resource;
 import soya.framework.commons.io.ResourceLoader;
-import soya.framework.commons.io.resource.ClasspathResourceLoader;
+import soya.framework.commons.io.resource.ClasspathResource;
+import soya.framework.commons.io.resource.InvokeResource;
+import soya.framework.commons.io.resource.TodoResource;
 import soya.framework.commons.io.resource.URLResourceLoader;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
@@ -24,11 +26,13 @@ public class ApplicationContextServiceLocator implements ServiceLocator {
         this.applicationContext = applicationContext;
 
         // predefined resource loaders:
-        resourceLoaders.put(ClasspathResourceLoader.CLASSPATH, new URLResourceLoader());
+        resourceLoaders.put(ClasspathResource.SCHEMA, ClasspathResource.loader());
+        resourceLoaders.put(InvokeResource.SCHEMA, InvokeResource.loader());
+        resourceLoaders.put(TodoResource.SCHEMA, TodoResource.loader());
 
         // additional resource loaders:
         applicationContext.getBeansOfType(ResourceLoader.class).values().forEach(e -> {
-            if(e instanceof NamespaceAware) {
+            if (e instanceof NamespaceAware) {
                 NamespaceAware namespaceAware = (NamespaceAware) e;
                 Arrays.stream(namespaceAware.getNamespaces()).forEach(n -> {
                     resourceLoaders.put(n, e);
@@ -79,17 +83,13 @@ public class ApplicationContextServiceLocator implements ServiceLocator {
     }
 
     @Override
-    public String getProperty(String propName, boolean required) throws ServiceLocateException {
-        String prop = applicationContext.getEnvironment().getProperty(propName);
-        if (required && prop == null) {
-            throw new ServiceLocateException("Property is not found: " + propName);
-        }
-        return prop;
+    public String getProperty(String propName) throws ServiceLocateException {
+        return applicationContext.getEnvironment().getProperty(propName);
     }
 
     @Override
     public Resource getResource(URI uri) throws ServiceLocateException {
-        if(resourceLoaders.containsKey(uri.getScheme())) {
+        if (resourceLoaders.containsKey(uri.getScheme())) {
             return resourceLoaders.get(uri.getScheme()).load(uri);
         }
         return defaultResourceLoader.load(uri);

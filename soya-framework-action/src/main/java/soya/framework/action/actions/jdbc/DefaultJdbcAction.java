@@ -15,6 +15,12 @@ public class DefaultJdbcAction extends JdbcAction<String> {
     )
     private String script;
 
+    @ActionParameter(
+            type = ActionParameterType.WIRED_VALUE,
+            referredTo = "true"
+    )
+    private boolean autoCommit;
+
     @Override
     public String call() throws Exception {
 
