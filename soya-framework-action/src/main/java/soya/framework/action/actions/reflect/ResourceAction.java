@@ -17,7 +17,8 @@ import java.util.concurrent.Callable;
 public class ResourceAction implements Callable<String> {
 
     @ActionParameter(
-            type = ActionParameterType.PROPERTY
+            type = ActionParameterType.PROPERTY,
+            required = true
     )
     private String uri;
 

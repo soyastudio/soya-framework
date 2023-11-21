@@ -7,9 +7,9 @@ import java.util.concurrent.Callable;
 
 @ActionDefinition(
         domain = "reflect",
-        name = "serviceNames"
+        name = "services"
 )
-public class ServiceNamesAction implements Callable<String[]>{
+public class ServiceNamesAction implements Callable<String[]> {
     @Override
     public String[] call() throws Exception {
         return ServiceLocatorSingleton.getInstance().serviceNames();

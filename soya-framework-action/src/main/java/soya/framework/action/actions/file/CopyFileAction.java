@@ -6,9 +6,9 @@ import java.io.File;
 
 @ActionDefinition(
         domain = "file",
-        name = "moveDir"
+        name = "copyFile"
 )
-public class MoveDirAction extends DirectoryAction {
+public class CopyFileAction extends FileAction<File> {
     @Override
     public File call() throws Exception {
         return null;

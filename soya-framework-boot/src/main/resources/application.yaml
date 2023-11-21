@@ -7,7 +7,5 @@ logging:
 
 soya:
   framework:
-    property: www
-    name: Wen Qun
-    restruts:
-      scanPackages: soya.framework.restruts.reflect,soya.framework.restruts.tool,soya.framework.spring.actions
+    action:
+      scanPackages: soya.framework

@@ -20,6 +20,9 @@ public abstract class ServiceLocatorSingleton implements ServiceLocator {
     }
 
     public static ServiceLocator getInstance() {
+        if (me == null) {
+            throw new IllegalStateException("ServiceLocator is not created.");
+        }
         return me;
     }
 

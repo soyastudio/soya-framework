@@ -2,10 +2,7 @@ package soya.framework.restruts.api;
 
 import com.google.gson.*;
 import io.swagger.parser.OpenAPIParser;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -36,8 +33,10 @@ public class OpenApiRenderer implements RestApiRenderer {
         OpenApiRenderer renderer = new OpenApiRenderer();
 
         OpenAPI openAPI = result.getOpenAPI();
+
+        // Paths:
+        openAPI.setPaths(new Paths());
         Paths paths = openAPI.getPaths();
-        paths.clear();
         Arrays.stream(registration.getActionMappings()).forEach(e -> {
             ActionMapping.Path path = e.getPath();
             PathItem pathItem = paths.get(path.getPath());
@@ -60,9 +59,10 @@ public class OpenApiRenderer implements RestApiRenderer {
                 pathItem.delete(operation);
 
             }
-
-
         });
+
+        // Components:
+        openAPI.setComponents(new Components());
 
         return toJson(openAPI);
     }

@@ -76,7 +76,25 @@
 
         <dependency>
             <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-azure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
             <artifactId>soya-framework-gherkin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-kafka</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-quartz</artifactId>
             <version>${project.version}</version>
         </dependency>
 
