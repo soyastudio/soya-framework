@@ -30,6 +30,10 @@ public final class Pipeline {
         return actionName;
     }
 
+    public boolean containsParameter(String name) {
+        return parameters.containsKey(name);
+    }
+
     public String[] parameterNames() {
         return parameters.keySet().toArray(new String[parameters.size()]);
     }
