@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 public class URLResourceLoader implements ResourceLoader {
+
     @Override
     public Resource load(URI uri) throws ResourceException {
         return new URLResource(uri);

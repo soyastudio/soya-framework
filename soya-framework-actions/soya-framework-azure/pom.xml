@@ -19,6 +19,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-action</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-blob</artifactId>
             <version>12.17.1</version>

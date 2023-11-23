@@ -59,13 +59,13 @@
 
         <dependency>
             <groupId>soya.framework</groupId>
-            <artifactId>soya-framework-gherkin</artifactId>
+            <artifactId>soya-framework-restruts</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>soya.framework</groupId>
-            <artifactId>soya-framework-restruts</artifactId>
+            <artifactId>soya-framework-action-restadapter</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -73,6 +73,30 @@
             <groupId>soya.framework</groupId>
             <artifactId>soya-framework-starter-restruts</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-azure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-gherkin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-kafka</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-quartz</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- test -->

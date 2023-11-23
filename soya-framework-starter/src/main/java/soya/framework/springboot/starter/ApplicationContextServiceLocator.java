@@ -5,10 +5,7 @@ import org.springframework.context.ApplicationContext;
 import soya.framework.commons.io.NamespaceAware;
 import soya.framework.commons.io.Resource;
 import soya.framework.commons.io.ResourceLoader;
-import soya.framework.commons.io.resource.ClasspathResource;
-import soya.framework.commons.io.resource.InvokeResource;
-import soya.framework.commons.io.resource.TodoResource;
-import soya.framework.commons.io.resource.URLResourceLoader;
+import soya.framework.commons.io.resource.*;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
 
@@ -26,6 +23,7 @@ public class ApplicationContextServiceLocator implements ServiceLocator {
         this.applicationContext = applicationContext;
 
         // predefined resource loaders:
+        resourceLoaders.put(EnvironmentResource.SCHEMA, EnvironmentResource.loader());
         resourceLoaders.put(ClasspathResource.SCHEMA, ClasspathResource.loader());
         resourceLoaders.put(InvokeResource.SCHEMA, InvokeResource.loader());
         resourceLoaders.put(TodoResource.SCHEMA, TodoResource.loader());

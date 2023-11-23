@@ -18,5 +18,4 @@ public @interface PipelineDefinition {
 
     TaskDefinition[] tasks();
 
-
 }
