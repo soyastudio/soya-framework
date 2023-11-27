@@ -1,13 +1,11 @@
 package soya.framework.action;
 
+import soya.framework.action.util.ConvertUtils;
 import soya.framework.commons.util.ReflectUtils;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -16,71 +14,112 @@ public final class ActionClass {
     private static Logger logger = Logger.getLogger(ActionClass.class.getName());
 
     private static Map<ActionName, ActionClass> registrations = new LinkedHashMap<>();
+    private static Map<ActionName, ActionFactory> creators = new HashMap<>();
 
-    private final ActionName actionName;
+    private static Map<Class<?>, ActionFactory> factories = new HashMap<>();
+    private static DefaultActionFactory defaultActionFactory = new DefaultActionFactory();
 
     private final Class<? extends Callable> actionType;
+    private final ActionName actionName;
+    private final Map<String, ActionProperty> params;
+    private final ActionProperty[] unwired;
 
-    private Map<String, Parameter> params = new LinkedHashMap<>();
-
-    private ActionClass(Class<? extends Callable> actionType) {
-        ActionDefinition annotation = actionType.getAnnotation(ActionDefinition.class);
-        if (annotation == null) {
-            throw new IllegalArgumentException();
-        }
-        this.actionName = new ActionName(annotation.domain(), annotation.name());
+    ActionClass(Class<? extends Callable> actionType, ActionName actionName, List<ActionProperty> parameters) {
+        this.actionName = actionName;
         this.actionType = actionType;
 
-        // From ActionDefinition annotation:
-        Arrays.stream(annotation.parameters()).forEach(e -> {
-            if (params.containsKey(e.name())) {
-                throw new IllegalArgumentException("");
-            }
-
-            Field field = ReflectUtils.getField(e.name(), actionType);
-            Parameter property = new Parameter(field, e);
-            params.put(e.name(), property);
-        });
-
-        Field[] fields = ReflectUtils.getFields(actionType);
-        Arrays.stream(fields).forEach(field -> {
-            if (!params.containsKey(field.getName())
-                    && !Modifier.isFinal(field.getModifiers())
-                    && !Modifier.isStatic(field.getModifiers())
-                    && field.getAnnotation(ActionParameter.class) != null) {
-                params.put(field.getName(), new Parameter(field));
+        Map<String, ActionProperty> map = new LinkedHashMap<>();
+        List<ActionProperty> unwiredList = new ArrayList<>();
+        parameters.forEach(e -> {
+            map.put(e.getName(), e);
+            if (!e.getParameterType().isWired()) {
+                unwiredList.add(e);
             }
         });
-    }
 
-    public ActionName getActionName() {
-        return actionName;
+        this.params = Collections.unmodifiableMap(map);
+        this.unwired = unwiredList.toArray(new ActionProperty[unwiredList.size()]);
     }
 
     public Class<? extends Callable> getActionType() {
         return actionType;
     }
 
-    Parameter[] parameters() {
-        return params.values().toArray(new Parameter[params.size()]);
+    public ActionName getActionName() {
+        return actionName;
     }
 
-    Parameter getParameter(String name) {
+    public String[] parameterNames() {
+        return params.keySet().toArray(new String[params.size()]);
+    }
+
+    public ActionParameterType parameterType(String name) {
+        if (!params.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
+        }
+        return params.get(name).getParameterType();
+    }
+
+    public String referredTo(String name) {
+        if (!params.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
+        }
+        return params.get(name).getReferredTo();
+    }
+
+    public boolean required(String name) {
+        if (!params.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
+        }
+        return params.get(name).isRequired();
+    }
+
+    public String description(String name) {
+        if (!params.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
+        }
+        return params.get(name).getDescription();
+    }
+
+    ActionProperty[] parameters() {
+        return params.values().toArray(new ActionProperty[params.size()]);
+    }
+
+    ActionProperty getParameter(String name) {
         return params.get(name);
     }
 
-    public static ActionName register(Class<? extends Callable> cls) {
-        if (cls.getAnnotation(ActionDefinition.class) == null) {
-            throw new IllegalArgumentException("Class is not annotated as 'ActionDefinition': " + cls.getName());
+    static void register(ActionFactory factory) {
+        Class<?> type = (Class<?>) ((ParameterizedType) factory.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        factories.put(type, factory);
+    }
+
+    static void register(ActionClass actionClass) {
+        ActionName actionName = actionClass.getActionName();
+        if (!registrations.containsKey(actionName)) {
+            registrations.put(actionName, actionClass);
+        }
+        creators.put(actionName, findActionFactory(actionClass.getActionType()));
+    }
+
+    private static ActionFactory findActionFactory(Class<?> cls) {
+        for (Map.Entry<Class<?>, ActionFactory> entry : factories.entrySet()) {
+            if (entry.getKey().isAssignableFrom(cls)) {
+                return entry.getValue();
+            }
         }
 
-        ActionDefinition annotation = cls.getAnnotation(ActionDefinition.class);
-        ActionName actionName = ActionName.create(annotation.domain(), annotation.name());
-        if (!registrations.containsKey(actionName)) {
-            registrations.put(actionName, new ActionClass(cls));
-            return actionName;
-        }
-        return null;
+        return defaultActionFactory;
+    }
+
+    public ActionExecutor<?> newInstance(ActionContext actionContext) {
+        return new ActionExecutor(actionName, creators.get(actionName).create(actionName, actionContext), unwired);
+    }
+
+    public static ActionName[] actionNames() {
+        List<ActionName> actionNames = new ArrayList<>(registrations.keySet());
+        Collections.sort(actionNames);
+        return actionNames.toArray(new ActionName[registrations.size()]);
     }
 
     public static ActionClass forName(ActionName actionName) {
@@ -91,120 +130,86 @@ public final class ActionClass {
         return registrations.get(actionName);
     }
 
-    public ActionExecutor<?> newInstance(ActionContext actionContext) {
-        return new ActionExecutor<>(this, actionContext);
+    static class DefaultActionFactory implements ActionFactory {
+        @Override
+        public Callable<?> create(ActionName actionName, ActionContext actionContext) {
+            try {
+                ActionClass actionClass = ActionClass.forName(actionName);
+                Class<?> actionType = actionClass.getActionType();
+                Callable<?> callable = (Callable<?>) actionType.newInstance();
+                if (DynamicAction.class.isAssignableFrom(actionType)) {
+                    Arrays.stream(actionClass.parameters()).forEach(e -> {
+                        DynamicAction dynaAction = (DynamicAction) callable;
+                        Object value = null;
+                        if (!e.getParameterType().isWired()) {
 
-/*
-        try {
-            Callable<?> instance = registrations.get(actionName).actionType.newInstance();
-            ActionExecutor<?> task = new ActionExecutor<>(actionName, instance);
 
-            params.values().forEach(p -> {
-                Field field = p.getField();
-                Object value = null;
-                if (p.type.equals(ActionParameterType.INPUT)) {
-                    task.addParameter(field, p.referredTo, p.required, true);
+                        } else if (ActionParameterType.WIRED_VALUE.equals(e.getParameterType())) {
+                            value = e.getReferredTo();
 
-                } else if (p.type.equals(ActionParameterType.PROPERTY)) {
-                    task.addParameter(field, p.referredTo, p.required, false);
+                        } else if (ActionParameterType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                            value = actionContext.getProperty(e.getReferredTo(), e.isRequired());
 
-                } else if (p.type.equals(ActionParameterType.WIRED_SERVICE)) {
-                    try {
-                        if (p.getReferredTo().trim().isEmpty()) {
-                            value = actionContext.getService(null, field.getType());
-                        } else {
-                            value = actionContext.getService(p.getReferredTo(), field.getType());
+                        } else if (ActionParameterType.WIRED_SERVICE.equals(e.getParameterType())) {
+                            try {
+                                // FIXME:
+
+                            } catch (NotFoundException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        } else if (ActionParameterType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                            // FIXME:
+
+
                         }
 
-                    } catch (ServiceNotFoundException ex) {
-                        if (p.isRequired()) {
-                            throw new RuntimeException(ex);
+                        if (value != null) {
+                            dynaAction.setParameter(e.getName(), value);
+                        }
+                    });
+
+                } else {
+                    Arrays.stream(actionClass.parameters()).forEach(e -> {
+                        Field field = ReflectUtils.findField(actionType, e.getName());
+                        Object value = null;
+                        if (!e.getParameterType().isWired()) {
+
+
+                        } else if (ActionParameterType.WIRED_VALUE.equals(e.getParameterType())) {
+                            value = ConvertUtils.convert(e.getReferredTo(), field.getType());
+
+                        } else if (ActionParameterType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                            value = ConvertUtils.convert(actionContext.getProperty(e.getReferredTo(), e.isRequired()), field.getType());
+
+                        } else if (ActionParameterType.WIRED_SERVICE.equals(e.getParameterType())) {
+                            try {
+                                // FIXME:
+                                value = actionContext.getService(e.getReferredTo(), field.getType());
+                            } catch (NotFoundException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        } else if (ActionParameterType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                            // FIXME:
+                            value = actionContext.getResource(e.getReferredTo(), field.getType());
+
                         }
 
-                    }
-
-                } else if (p.type.equals(ActionParameterType.WIRED_PROPERTY)) {
-                    if (p.getReferredTo() == null) {
-                        throw new IllegalArgumentException("'referredTo' is required.");
-                    }
-                    value = ConvertUtils.convert(actionContext.getProperty(p.getReferredTo()), field.getType());
-
-                } else if (p.type.equals(ActionParameterType.WIRED_RESOURCE)) {
-                    value = actionContext.getResource(p.getReferredTo(), field.getType());
-
+                        if (value != null) {
+                            field.setAccessible(true);
+                            try {
+                                field.set(callable, value);
+                            } catch (IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    });
                 }
 
-                if (value != null) {
-                    field.setAccessible(true);
-                    try {
-                        field.set(instance, value);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+                return callable;
 
-            return task;
-
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-
-        }*/
-    }
-
-    static class Parameter implements Serializable {
-        private final transient Field field;
-
-        private ActionParameterType type;
-        private String referredTo;
-        private boolean required;
-        private String description;
-
-        Parameter(Field field, ActionParameter annotation) {
-            this.field = field;
-            set(annotation.type(),
-                    annotation.referredTo(),
-                    annotation.required(),
-                    annotation.description());
-        }
-
-        Parameter(Field field) {
-            this.field = field;
-            ActionParameter annotation = field.getAnnotation(ActionParameter.class);
-            set(annotation.type(),
-                    annotation.referredTo(),
-                    annotation.required(),
-                    annotation.description());
-        }
-
-        void set(ActionParameterType type,
-                 String referredTo,
-                 boolean required,
-                 String description) {
-            this.type = type;
-            this.referredTo = referredTo;
-            this.required = required;
-            this.description = description;
-        }
-
-        public Field getField() {
-            return field;
-        }
-
-        public ActionParameterType getType() {
-            return type;
-        }
-
-        public String getReferredTo() {
-            return referredTo;
-        }
-
-        public boolean isRequired() {
-            return required;
-        }
-
-        public String getDescription() {
-            return description;
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

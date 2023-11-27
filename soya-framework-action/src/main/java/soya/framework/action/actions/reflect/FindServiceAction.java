@@ -2,7 +2,7 @@ package soya.framework.action.actions.reflect;
 
 import com.google.gson.GsonBuilder;
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 import soya.framework.action.ActionParameterType;
 import soya.framework.context.ServiceLocatorSingleton;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 )
 public class FindServiceAction implements Callable<String> {
 
-    @ActionParameter(type = ActionParameterType.PROPERTY,
+    @ActionParameterDefinition(type = ActionParameterType.PROPERTY,
             required = true)
     private String type;
 

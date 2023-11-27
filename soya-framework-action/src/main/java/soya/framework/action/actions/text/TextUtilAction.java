@@ -1,21 +1,20 @@
 package soya.framework.action.actions.text;
 
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 import soya.framework.action.ActionParameterType;
 
 import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public abstract class TextUtilAction implements Callable<String> {
     public static final Charset DEFAULT_ENCODING = Charset.defaultCharset();
 
-    @ActionParameter(
+    @ActionParameterDefinition(
             type = ActionParameterType.PROPERTY
     )
     protected String encoding;
 
-    @ActionParameter(
+    @ActionParameterDefinition(
             type = ActionParameterType.INPUT
     )
     protected String text;

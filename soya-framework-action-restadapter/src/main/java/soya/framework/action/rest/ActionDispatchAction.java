@@ -18,13 +18,13 @@ public final class ActionDispatchAction extends DispatchAction<String> {
 
     public ActionDispatchAction(ActionMapping mapping) {
         super(mapping);
-
         try {
             actionClass = ActionClass.forName(ActionName.fromURI(new URI(mapping.getAction())));
             Arrays.stream(mapping.getParameters()).forEach(p -> {
                 if(!p.getParameterType().equals(ParamType.WIRED_PROPERTY)
                 || !p.getParameterType().equals(ParamType.WIRED_SERVICE)
                 || !p.getParameterType().equals(ParamType.WIRED_RESOURCE)) {
+
                     properties.put(p.getName(), new DynaProperty(p.getName(), String.class));
 
                 }
@@ -46,6 +46,7 @@ public final class ActionDispatchAction extends DispatchAction<String> {
         });
 
         Object result = actionExecutor.execute();
+
         if(result instanceof String) {
             return (String) result;
         } else {

@@ -1,7 +1,7 @@
 package soya.framework.action.actions.reflect;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 import soya.framework.action.ActionParameterType;
 import soya.framework.commons.io.Resource;
 import soya.framework.context.ServiceLocatorSingleton;
@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 )
 public class ResourceAction implements Callable<String> {
 
-    @ActionParameter(
+    @ActionParameterDefinition(
             type = ActionParameterType.PROPERTY,
             required = true
     )

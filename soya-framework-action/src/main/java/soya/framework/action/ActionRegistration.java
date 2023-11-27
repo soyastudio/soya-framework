@@ -1,12 +1,16 @@
 package soya.framework.action;
 
-import java.util.concurrent.Callable;
+public class ActionRegistration {
 
-public interface ActionRegistration {
+    public ActionRegistration register(ActionFactory factory) {
+        ActionClass.register(factory);
+        return this;
+    }
 
-    String[] domains();
-
-    ActionName[] actions(String domain);
-
-    Class<? extends Callable>  actionType(ActionName actionName);
+    public ActionRegistration load(ActionClassScanner scanner) {
+        scanner.scan().forEach(e -> {
+            ActionClass.register(e);
+        });
+        return this;
+    }
 }

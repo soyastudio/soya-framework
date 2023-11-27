@@ -44,7 +44,6 @@ public class KafkaConfiguration {
         private Map<String, KafkaClient> clients = new HashMap<>();
 
         DefaultKafkaClientFactory() {
-
         }
 
         DefaultKafkaClientFactory add(Properties properties) {
@@ -54,15 +53,14 @@ public class KafkaConfiguration {
             return this;
         }
 
-
         @Override
         public KafkaClient getKafkaClient(String name) {
             Objects.requireNonNull(name);
-
             String key = name.toUpperCase();
             if (!clients.containsKey(key)) {
                 throw new IllegalArgumentException("Kafka client is not defined: " + name);
             }
+
             return clients.get(key);
         }
     }

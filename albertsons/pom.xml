@@ -40,6 +40,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
+            <version>3.14.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>soya.framework</groupId>
             <artifactId>soya-framework-core</artifactId>
             <version>${project.version}</version>

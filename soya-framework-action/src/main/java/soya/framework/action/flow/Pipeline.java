@@ -1,6 +1,5 @@
 package soya.framework.action.flow;
 
-import soya.framework.action.ActionContext;
 import soya.framework.action.ActionName;
 import soya.framework.action.ActionParameterType;
 
@@ -43,74 +42,25 @@ public final class Pipeline {
     }
 
     public ActionParameterType parameterType(String name) {
+        if (!parameters.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name +
+                    "' is not defined for " + actionName);
+        }
+
         return parameters.get(name).parameterType;
     }
 
-    public static PipelineExecutor executor(Object input, ActionName actionName, ActionContext actionContext) {
-        if(!pipelines.containsKey(actionName)) {
-            throw new IllegalArgumentException("Pipeline is not defined: " + actionName);
+    public boolean required(String name) {
+        if (!parameters.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter '" + name +
+                    "' is not defined for " + actionName);
         }
 
-        Pipeline pipeline = pipelines.get(actionName);
-        return new PipelineExecutor(startSession(input, pipelines.get(actionName), actionContext), pipeline.tasks, actionContext);
+        return parameters.get(name).required;
     }
 
-    private static Session startSession(Object input, Pipeline pipeline, ActionContext actionContext) {
-        return new DefaultSession(input, pipeline, actionContext);
-    }
-
-    private static class DefaultSession implements Session {
-
-        private final ActionName actionName;
-        private final String id;
-        private final long startTime;
-
-        private Map<String, Object> parameters = new LinkedHashMap<>();
-        private Map<String, Object> attributes = new HashMap<>();
-
-        private DefaultSession(Object input, Pipeline pipeline, ActionContext actionContext) {
-            this.actionName = pipeline.getActionName();
-            this.id = UUID.randomUUID().toString();
-            this.startTime = System.currentTimeMillis();
-
-            parameters.putAll(actionContext.getService(null, Consumer.class).consume(input, pipeline));
-
-        }
-
-        @Override
-        public ActionName getActionName() {
-            return actionName;
-        }
-
-        @Override
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public long startTime() {
-            return startTime;
-        }
-
-        @Override
-        public Object getParameter(String name) {
-            return parameters.get(name);
-        }
-
-        @Override
-        public Object get(String attrName) {
-            return attributes.get(attrName);
-        }
-
-        @Override
-        public void set(String attrName, Object attrValue) {
-            if (attrValue == null) {
-                attributes.remove(attrName);
-            } else {
-                attributes.put(attrName, attrValue);
-            }
-        }
-
+    public static Pipeline forName(ActionName actionName) {
+        return pipelines.get(actionName);
     }
 
     public static class Builder {

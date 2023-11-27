@@ -1,6 +1,6 @@
 package soya.framework.action.flow;
 
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 
 import java.lang.annotation.*;
 
@@ -8,13 +8,14 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface PipelineDefinition {
+
     String domain();
 
     String name();
 
     String description() default "";
 
-    ActionParameter[] parameters() default {};
+    ActionParameterDefinition[] parameters() default {};
 
     TaskDefinition[] tasks();
 

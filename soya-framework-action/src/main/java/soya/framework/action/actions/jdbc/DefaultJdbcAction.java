@@ -1,7 +1,7 @@
 package soya.framework.action.actions.jdbc;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 import soya.framework.action.ActionParameterType;
 
 @ActionDefinition(
@@ -10,12 +10,12 @@ import soya.framework.action.ActionParameterType;
 )
 public class DefaultJdbcAction extends JdbcAction<String> {
 
-    @ActionParameter(
+    @ActionParameterDefinition(
             type = ActionParameterType.INPUT
     )
     private String script;
 
-    @ActionParameter(
+    @ActionParameterDefinition(
             type = ActionParameterType.WIRED_VALUE,
             referredTo = "true"
     )

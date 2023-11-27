@@ -1,6 +1,6 @@
 package soya.framework.action.actions.jdbc;
 
-import soya.framework.action.ActionParameter;
+import soya.framework.action.ActionParameterDefinition;
 import soya.framework.action.ActionParameterType;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 
 public abstract class DatabaseUtilAction<T> implements Callable<T> {
 
-    @ActionParameter(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
     protected String dataSourceName;
 
     protected DataSource getDataSource() {

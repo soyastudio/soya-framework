@@ -132,6 +132,7 @@ public class ActionServlet extends HttpServlet {
 
         if(constructor.getParameters().length == 1
                 && constructor.getParameters()[0].getType().equals(ActionMapping.class)) {
+
             try {
                 callable = (Callable<?>) constructor.newInstance(mapping);
 

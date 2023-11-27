@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.Callable;
 
 public class ActionRestAdapter implements RestActionLoader {
 
@@ -30,24 +29,23 @@ public class ActionRestAdapter implements RestActionLoader {
     @Override
     public Set<ActionMapping> load() {
         Set<ActionMapping> set = new HashSet<>();
-        Arrays.stream(actionRegistration.actions(null)).forEach(e -> {
+        Arrays.stream(ActionClass.actionNames()).forEach(e -> {
             if (!excludes.contains(e.getDomain())) {
-                set.add(map(actionRegistration.actionType(e)));
+                set.add(map(ActionClass.forName(e)));
             }
         });
 
         return set;
     }
 
-    private ActionMapping map(Class<? extends Callable> cls) {
-        ActionDefinition annotation = cls.getAnnotation(ActionDefinition.class);
-        ActionName actionName = ActionName.create(annotation.domain(), annotation.name());
+    private ActionMapping map(ActionClass actionClass) {
+        ActionName actionName = actionClass.getActionName();
 
-        String id = "soya-" + annotation.domain().replace(".", "_").replace("-", "_") + "-" + annotation.name();
+        String id = "soya-" + actionName.getDomain().replace(".", "_").replace("-", "_") + "-" + actionName.getName();
 
         ActionMapping.Builder builder = ActionMapping.builder()
                 .id(id)
-                .action(annotation.domain() + "://" + annotation.name())
+                .action(actionName.getDomain() + "://" + actionName.getName())
                 .actionClass(ActionDispatchAction.class)
                 .path(namingStrategy.toPath(actionName))
                 .method(HttpMethod.POST)
@@ -55,29 +53,33 @@ public class ActionRestAdapter implements RestActionLoader {
                 .produces(new String[]{MediaType.TEXT_PLAIN})
                 .tags(new String[]{namingStrategy.toTag(actionName)});
 
-        Arrays.stream(ReflectUtils.getFields(cls)).forEach(field -> {
-            if (!Modifier.isStatic(field.getModifiers())
-                    && !Modifier.isFinal(field.getModifiers())
-                    && field.getAnnotation(ActionParameter.class) != null) {
-                ActionParameter parameter = field.getAnnotation(ActionParameter.class);
-                if(!parameter.type().isWired()) {
-                    builder.addParameter(field.getName(),
-                            getParamType(parameter.type()),
-                            parameter.referredTo(),
-                            parameter.required(),
-                            parameter.description());
+        Class<?> cls = actionClass.getActionType();
+        if(DynamicAction.class.isAssignableFrom(cls)) {
+            Arrays.stream(ReflectUtils.getFields(cls)).forEach(field -> {
+                if (!Modifier.isStatic(field.getModifiers())
+                        && !Modifier.isFinal(field.getModifiers())
+                        && field.getAnnotation(ActionParameterDefinition.class) != null) {
+                    ActionParameterDefinition parameter = field.getAnnotation(ActionParameterDefinition.class);
+                    if(!parameter.type().isWired()) {
+                        builder.addParameter(field.getName(),
+                                getParamType(parameter.type()),
+                                parameter.referredTo(),
+                                parameter.required(),
+                                parameter.description());
 
+                    }
                 }
-            }
-        });
+            });
+        }
 
-        Arrays.stream(annotation.parameters()).forEach(param -> {
-            if(!param.type().isWired()) {
-                builder.addParameter(param.name(),
-                        getParamType(param.type()),
-                        param.referredTo(),
-                        param.required(),
-                        param.description());
+        Arrays.stream(actionClass.parameterNames()).forEach(param -> {
+            if(!actionClass.parameterType(param).isWired()) {
+
+                builder.addParameter(param,
+                        getParamType(actionClass.parameterType(param)),
+                        actionClass.referredTo(param),
+                        actionClass.required(param),
+                        actionClass.description(param));
 
             }
         });

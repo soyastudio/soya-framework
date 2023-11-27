@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import soya.framework.action.ActionContext;
+import soya.framework.action.ActionRegistration;
 
 @Configuration
 @EnableConfigurationProperties(ActionProperties.class)
@@ -20,8 +21,6 @@ public class ActionAutoConfiguration {
 
     private SpringActionContext actionContext;
 
-    private DefaultActionRegistration registration;
-
     @Bean
     ActionContext actionContext() {
         this.actionContext = new SpringActionContext();
@@ -29,15 +28,18 @@ public class ActionAutoConfiguration {
     }
 
     @Bean
-    DefaultActionRegistration actionRegistration() {
-        this.registration = new DefaultActionRegistration();
+    ActionRegistration actionRegistration(ApplicationContext applicationContext) {
+        ActionRegistration registration = new ActionRegistration();
+        if (properties.getScanPackages() != null) {
+            String[] pkgs = properties.getScanPackages().split(",");
+            registration.load(new ActionDefinitionAnnotationScanner(pkgs));
+        }
+
         return registration;
     }
 
     @EventListener
     public void onEvent(ApplicationStartedEvent event) {
-        if (properties.getScanPackages() != null) {
-            registration.register(properties.getScanPackages().split(","));
-        }
+
     }
 }

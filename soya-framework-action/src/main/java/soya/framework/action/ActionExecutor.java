@@ -1,6 +1,7 @@
 package soya.framework.action;
 
 import soya.framework.action.util.ConvertUtils;
+import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -9,37 +10,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public final class ActionExecutor<T> {
-    private final ActionClass actionClass;
-    private final ActionContext actionContext;
-    private List<String> wired = new ArrayList<>();
+
+    private final ActionName actionName;
     private Map<String, Property> properties = new HashMap<>();
     private String inputParamName;
 
-    ActionExecutor(ActionClass actionClass, ActionContext actionContext) {
-        this.actionClass = actionClass;
-        this.actionContext = actionContext;
+    private Callable<?> callable;
 
-        Arrays.stream(actionClass.parameters()).forEach(e -> {
-            String paramName = e.getField().getName();
-            ActionParameterType paramType = e.getType();
-            if (paramType.isWired()) {
-                wired.add(paramName);
-
-            } else if (!paramType.isWired()) {
-                properties.put(paramName, new Property(e));
-                if (paramType.equals(ActionParameterType.INPUT)) {
-                    if (inputParamName != null) {
-                        throw new IllegalArgumentException("Action can only have one field annotated as INPUT parameter!");
-                    } else {
-                        inputParamName = paramName;
-                    }
-                }
+    ActionExecutor(ActionName actionName, Callable<?> callable, ActionProperty[] parameters) {
+        this.actionName = actionName;
+        Arrays.stream(parameters).forEach(e -> {
+            properties.put(e.getName(), new Property(e));
+            if(e.getParameterType().equals(ActionParameterType.INPUT)) {
+                inputParamName = e.getName();
             }
         });
+
+        this.callable = callable;
     }
 
     public ActionName getActionName() {
-        return actionClass.getActionName();
+        return actionName;
     }
 
     public String[] getParameterNames() {
@@ -55,14 +46,14 @@ public final class ActionExecutor<T> {
         if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined: " + name);
         }
-        return properties.get(name).type;
+        return properties.get(name).parameter.getType();
     }
 
     public boolean isParameterRequired(String name) {
         if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined: " + name);
         }
-        return properties.get(name).required;
+        return properties.get(name).parameter.isRequired();
     }
 
     public void set(String name, String value) {
@@ -71,7 +62,7 @@ public final class ActionExecutor<T> {
         }
 
         Property property = properties.get(name);
-        property.set(ConvertUtils.convert(value, property.type));
+        property.set(ConvertUtils.convert(value, property.parameter.getType()));
     }
 
     public ActionExecutor<T> reset() {
@@ -82,75 +73,80 @@ public final class ActionExecutor<T> {
     }
 
     public T execute() throws Exception {
-        return (T) create().call();
+        populate(callable);
+        return (T) callable.call();
     }
 
     public Future<T> submit(ExecutorService executorService) throws Exception {
-        return (Future<T>) executorService.submit(create());
+        populate(callable);
+        return (Future<T>) executorService.submit(callable);
     }
 
-    private Callable<?> create() throws InstantiationException, IllegalAccessException {
+    private void populate(Callable<?> callable) {
         Iterator<Property> iterator = properties.values().iterator();
         while (iterator.hasNext()) {
             Property property = iterator.next();
-            if (property.required && property.value == null) {
-                throw new IllegalStateException("Property is required: " + property.name);
+            if (property.isRequired() && property.value == null) {
+                throw new IllegalStateException("Property is required: " + property.getName());
             }
         }
 
-        Callable<?> callable = actionClass.getActionType().newInstance();
-        Arrays.stream(actionClass.parameters()).forEach(parameter -> {
-            Field field = parameter.getField();
-            Object value = null;
-            if (!parameter.getType().isWired()) {
-                value = properties.get(field.getName()).value;
-
-            } else if (ActionParameterType.WIRED_VALUE.equals(parameter.getType())) {
-                value = ConvertUtils.convert(parameter.getReferredTo(), field.getType());
-
-            } else if (ActionParameterType.WIRED_PROPERTY.equals(parameter.getType())) {
-                value = ConvertUtils.convert(actionContext.getProperty(parameter.getReferredTo(), parameter.isRequired()), field.getType());
-
-            } else if (ActionParameterType.WIRED_SERVICE.equals(parameter.getType())) {
-                try {
-                    // FIXME:
-                    value = actionContext.getService(parameter.getReferredTo(), field.getType());
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
+        Class<? extends Callable<?>> actionType = (Class<? extends Callable<?>>) callable.getClass();
+        if(DynamicAction.class.isAssignableFrom(actionType)) {
+            DynamicAction dynamicAction = (DynamicAction) callable;
+            properties.entrySet().forEach(e -> {
+                Object value = properties.get(e.getKey()).value;
+                if (value != null) {
+                    dynamicAction.setParameter(e.getKey(), value);
                 }
-            } else if (ActionParameterType.WIRED_RESOURCE.equals(parameter.getType())) {
-                // FIXME:
-                value = actionContext.getResource(parameter.getReferredTo(), field.getType());
+            });
 
-            }
+        } else {
+            properties.entrySet().forEach(e -> {
+                Field field = ReflectUtils.findField(actionType, e.getKey());
+                Object value = properties.get(field.getName()).value;
+                if (value != null) {
+                    field.setAccessible(true);
+                    try {
+                        field.set(callable, value);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
 
-            if (value != null) {
-                field.setAccessible(true);
-                try {
-                    field.set(callable, value);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    }
                 }
-            }
-
-        });
-
-        return callable;
+            });
+        }
     }
 
-    static class Property {
-        private final String name;
-        private final Class<?> type;
 
-        private final boolean required;
+    static class Property {
+        private ActionProperty parameter;
 
         private Object value;
 
-        public Property(ActionClass.Parameter parameter) {
-            this.name = parameter.getField().getName();
-            this.type = parameter.getField().getType();
-            this.required = parameter.isRequired();
+        public Property(ActionProperty parameter) {
+            this.parameter = parameter;
 
+        }
+
+        String getName() {
+            return parameter.getName();
+        }
+
+        Class<?> getType() {
+            return parameter.getType();
+        }
+
+        ActionParameterType getParameterType() {
+            return parameter.getParameterType();
+        }
+
+        String getReferredTo() {
+            return parameter.getReferredTo();
+        }
+
+        boolean isRequired() {
+            return parameter.isRequired();
         }
 
         void set(Object value) {

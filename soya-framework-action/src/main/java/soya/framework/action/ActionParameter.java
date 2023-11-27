@@ -1,21 +1,43 @@
 package soya.framework.action;
 
-import java.lang.annotation.*;
+public class ActionParameter {
 
-@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface ActionParameter {
-    String name() default "";
+    private final ActionProperty property;
+    private Object value;
 
-    ActionParameterType type();
+    public ActionParameter(ActionProperty property) {
+        this.property = property;
+    }
 
-    String referredTo() default "";
+    public String getName() {
+        return property.getName();
+    }
 
-    int order() default 5;
+    public Class<?> getType() {
+        return property.getType();
+    }
 
-    boolean required() default false;
+    public ActionParameterType getParameterType() {
+        return property.getParameterType();
+    }
 
-    String description() default "";
+    public String getReferredTo() {
+        return property.getReferredTo();
+    }
 
+    public boolean isRequired() {
+        return property.isRequired();
+    }
+
+    public String getDescription() {
+        return property.getDescription();
+    }
+
+    public Object get() {
+        return value;
+    }
+
+    public void set(Object value) {
+        this.value = value;
+    }
 }
