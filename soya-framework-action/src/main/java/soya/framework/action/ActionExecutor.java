@@ -92,8 +92,8 @@ public final class ActionExecutor<T> {
         }
 
         Class<? extends Callable<?>> actionType = (Class<? extends Callable<?>>) callable.getClass();
-        if(DynamicAction.class.isAssignableFrom(actionType)) {
-            DynamicAction dynamicAction = (DynamicAction) callable;
+        if(DynaAction.class.isAssignableFrom(actionType)) {
+            DynaAction dynamicAction = (DynaAction) callable;
             properties.entrySet().forEach(e -> {
                 Object value = properties.get(e.getKey()).value;
                 if (value != null) {

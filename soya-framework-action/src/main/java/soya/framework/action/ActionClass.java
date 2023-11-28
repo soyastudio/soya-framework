@@ -137,9 +137,9 @@ public final class ActionClass {
                 ActionClass actionClass = ActionClass.forName(actionName);
                 Class<?> actionType = actionClass.getActionType();
                 Callable<?> callable = (Callable<?>) actionType.newInstance();
-                if (DynamicAction.class.isAssignableFrom(actionType)) {
+                if (DynaAction.class.isAssignableFrom(actionType)) {
                     Arrays.stream(actionClass.parameters()).forEach(e -> {
-                        DynamicAction dynaAction = (DynamicAction) callable;
+                        DynaAction dynaAction = (DynaAction) callable;
                         Object value = null;
                         if (!e.getParameterType().isWired()) {
 

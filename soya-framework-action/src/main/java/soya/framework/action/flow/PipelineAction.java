@@ -2,13 +2,13 @@ package soya.framework.action.flow;
 
 import soya.framework.action.ActionName;
 import soya.framework.action.ActionParameterType;
-import soya.framework.action.DynamicAction;
+import soya.framework.action.DynaAction;
 import soya.framework.action.util.ConvertUtils;
 
 import java.util.*;
 import java.util.concurrent.Callable;
 
-public abstract class PipelineAction<T> implements DynamicAction, Callable<T> {
+public abstract class PipelineAction<T> implements DynaAction, Callable<T> {
 
     private final Pipeline pipeline;
     private final Map<String, Wrapper> params;

@@ -17,3 +17,7 @@ soya:
 
       kafka:
         factory: kafka-core-qa.properties, kafka-core-dev.properties, kafka-platform-qa.properties, kafka-platform-dev.properties
+
+albertsons:
+  workspace:
+    home: C:/albertsons/workspace

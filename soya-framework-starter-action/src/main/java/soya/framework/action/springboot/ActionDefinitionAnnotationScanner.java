@@ -54,7 +54,7 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
         ActionClassBuilder builder = new ActionClassBuilder()
                 .actionType(actionType)
                 .actionName(ActionName.create(annotation.domain(), annotation.name()));
-        if (DynamicAction.class.isAssignableFrom(actionType)) {
+        if (DynaAction.class.isAssignableFrom(actionType)) {
             Arrays.stream(annotation.parameters()).forEach(p -> {
                 builder.addProperty(ActionProperty.builder()
                         .name(p.name())

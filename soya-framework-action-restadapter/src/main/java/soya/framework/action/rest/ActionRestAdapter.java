@@ -54,7 +54,7 @@ public class ActionRestAdapter implements RestActionLoader {
                 .tags(new String[]{namingStrategy.toTag(actionName)});
 
         Class<?> cls = actionClass.getActionType();
-        if(DynamicAction.class.isAssignableFrom(cls)) {
+        if(DynaAction.class.isAssignableFrom(cls)) {
             Arrays.stream(ReflectUtils.getFields(cls)).forEach(field -> {
                 if (!Modifier.isStatic(field.getModifiers())
                         && !Modifier.isFinal(field.getModifiers())

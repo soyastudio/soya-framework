@@ -1,6 +1,6 @@
 package soya.framework.action;
 
-public interface DynamicAction {
+public interface DynaAction {
 
     String[] parameterNames();
 
