@@ -20,7 +20,7 @@ public final class ActionExecutor<T> {
         this.actionName = actionName;
         Arrays.stream(properties).forEach(e -> {
             parameters.put(e.getName(), new ActionParameter(e));
-            if (e.getParameterType().equals(ActionParameterType.INPUT)) {
+            if (e.getParameterType().equals(ActionPropertyType.INPUT)) {
                 inputParamName = e.getName();
             }
         });

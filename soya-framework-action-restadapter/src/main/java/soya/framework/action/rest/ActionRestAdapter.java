@@ -58,11 +58,11 @@ public class ActionRestAdapter implements RestActionLoader {
             Arrays.stream(ReflectUtils.getFields(cls)).forEach(field -> {
                 if (!Modifier.isStatic(field.getModifiers())
                         && !Modifier.isFinal(field.getModifiers())
-                        && field.getAnnotation(ActionParameterDefinition.class) != null) {
-                    ActionParameterDefinition parameter = field.getAnnotation(ActionParameterDefinition.class);
-                    if(!parameter.parameterType().isWired()) {
+                        && field.getAnnotation(ActionPropertyDefinition.class) != null) {
+                    ActionPropertyDefinition parameter = field.getAnnotation(ActionPropertyDefinition.class);
+                    if(!parameter.propertyType().isWired()) {
                         builder.addParameter(field.getName(),
-                                getParamType(parameter.parameterType()),
+                                getParamType(parameter.propertyType()),
                                 parameter.referredTo(),
                                 parameter.required(),
                                 parameter.description());
@@ -87,7 +87,7 @@ public class ActionRestAdapter implements RestActionLoader {
         return builder.create();
     }
 
-    private ParamType getParamType(ActionParameterType apt) {
+    private ParamType getParamType(ActionPropertyType apt) {
         switch (apt) {
             case INPUT:
                 return ParamType.PAYLOAD;

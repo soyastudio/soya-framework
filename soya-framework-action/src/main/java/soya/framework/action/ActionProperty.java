@@ -1,18 +1,17 @@
 package soya.framework.action;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public final class ActionProperty implements Serializable {
 
     private final String name;
     private final Class<?> type;
-    private final ActionParameterType parameterType;
+    private final ActionPropertyType parameterType;
     private final String referredTo;
     private final boolean required;
     private final String description;
 
-    private ActionProperty(String name, Class<?> type, ActionParameterType parameterType, String referredTo, boolean required, String description) {
+    private ActionProperty(String name, Class<?> type, ActionPropertyType parameterType, String referredTo, boolean required, String description) {
         this.name = name;
         this.type = type;
         this.parameterType = parameterType;
@@ -29,7 +28,7 @@ public final class ActionProperty implements Serializable {
         return type;
     }
 
-    public ActionParameterType getParameterType() {
+    public ActionPropertyType getParameterType() {
         return parameterType;
     }
 
@@ -53,7 +52,7 @@ public final class ActionProperty implements Serializable {
 
         private String name;
         private Class<?> type;
-        private ActionParameterType parameterType;
+        private ActionPropertyType parameterType;
         private String referredTo;
         private boolean required;
         private String description;
@@ -71,7 +70,7 @@ public final class ActionProperty implements Serializable {
             return this;
         }
 
-        public Builder parameterType(ActionParameterType parameterType) {
+        public Builder parameterType(ActionPropertyType parameterType) {
             this.parameterType = parameterType;
             return this;
         }

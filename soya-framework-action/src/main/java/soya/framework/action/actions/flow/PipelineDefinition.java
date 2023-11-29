@@ -1,6 +1,6 @@
 package soya.framework.action.actions.flow;
 
-import soya.framework.action.ActionParameterDefinition;
+import soya.framework.action.ActionPropertyDefinition;
 
 import java.lang.annotation.*;
 
@@ -15,7 +15,7 @@ public @interface PipelineDefinition {
 
     String description() default "";
 
-    ActionParameterDefinition[] parameters() default {};
+    ActionPropertyDefinition[] parameters() default {};
 
     TaskDefinition[] tasks();
 

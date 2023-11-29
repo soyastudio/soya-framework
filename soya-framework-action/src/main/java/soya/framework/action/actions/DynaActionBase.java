@@ -1,7 +1,7 @@
 package soya.framework.action.actions;
 
 import soya.framework.action.ActionParameter;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.action.DynaAction;
 import soya.framework.commons.conversion.ConvertUtils;
 
@@ -19,7 +19,7 @@ public abstract class DynaActionBase<T> implements DynaAction, Callable<T> {
     }
 
     @Override
-    public ActionParameterType parameterType(String paramName) {
+    public ActionPropertyType parameterType(String paramName) {
         if (!parameters.containsKey(paramName)) {
             throw new IllegalArgumentException("Parameter is not defined: " + paramName);
         }

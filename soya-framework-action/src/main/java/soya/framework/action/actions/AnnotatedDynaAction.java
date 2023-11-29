@@ -20,11 +20,11 @@ public abstract class AnnotatedDynaAction<T> extends DynaActionBase<T> {
     protected ActionProperty[] fromAnnotation() {
         List<ActionProperty> list = new ArrayList<>();
         ActionDefinition annotation = getClass().getAnnotation(ActionDefinition.class);
-        Arrays.stream(annotation.parameters()).forEach(p -> {
+        Arrays.stream(annotation.properties()).forEach(p -> {
             list.add(ActionProperty.builder()
                     .name(p.name())
                     .type(DefaultUtils.isDefaultType(p.type())? Object.class : p.type())
-                    .parameterType(p.parameterType())
+                    .parameterType(p.propertyType())
                     .referredTo(p.referredTo())
                     .required(p.required())
                     .description(p.description())

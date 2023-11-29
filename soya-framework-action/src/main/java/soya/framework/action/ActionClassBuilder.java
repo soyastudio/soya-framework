@@ -28,11 +28,11 @@ public class ActionClassBuilder {
         return this;
     }
 
-    public ActionClassBuilder addProperty(Field field, ActionParameterDefinition annotation) {
+    public ActionClassBuilder addProperty(Field field, ActionPropertyDefinition annotation) {
         this.properties.add(ActionProperty.builder()
                 .name(field.getName())
                 .type(DefaultUtils.isDefaultType(annotation.type())? field.getType() : DefaultUtils.getDefaultType(field.getType()))
-                .parameterType(annotation.parameterType())
+                .parameterType(annotation.propertyType())
                 .referredTo(annotation.referredTo())
                 .required(annotation.required())
                 .description(annotation.description())

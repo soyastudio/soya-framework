@@ -2,8 +2,8 @@ package soya.framework.kafka.action;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
         name = "admin-topics")
 public class KafkaTopicsAction extends KafkaAdminAction<String[]> {
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     private String query;
 
     @Override

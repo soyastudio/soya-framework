@@ -1,8 +1,8 @@
 package soya.framework.action.actions.test;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.action.actions.dispatch.DispatchAction;
 import soya.framework.action.actions.dispatch.DispatchActionDefinition;
 import soya.framework.action.actions.dispatch.DispatchActionParameter;
@@ -10,9 +10,9 @@ import soya.framework.action.actions.dispatch.DispatchActionParameter;
 @ActionDefinition(
         domain = "test",
         name = "dispatchActionTest",
-        parameters = {
-                @ActionParameterDefinition(name = "value",
-                        parameterType = ActionParameterType.WIRED_RESOURCE,
+        properties = {
+                @ActionPropertyDefinition(name = "value",
+                        propertyType = ActionPropertyType.WIRED_RESOURCE,
                         referredTo = "classpath:banner.txt")
         }
 )

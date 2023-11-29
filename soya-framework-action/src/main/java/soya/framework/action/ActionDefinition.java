@@ -12,6 +12,6 @@ public @interface ActionDefinition {
 
     String description() default "";
 
-    ActionParameterDefinition[] parameters() default {};
+    ActionPropertyDefinition[] properties() default {};
 
 }

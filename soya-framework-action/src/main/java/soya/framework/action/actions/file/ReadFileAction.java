@@ -1,8 +1,8 @@
 package soya.framework.action.actions.file;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 
 @ActionDefinition(
         domain = "file",
@@ -10,7 +10,7 @@ import soya.framework.action.ActionParameterType;
 )
 public class ReadFileAction extends FileAction<String> {
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     private String parser;
     @Override
     public String call() throws Exception {

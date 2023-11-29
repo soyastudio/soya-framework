@@ -19,7 +19,7 @@ public final class ActionParameter {
         return property.getType();
     }
 
-    public ActionParameterType getParameterType() {
+    public ActionPropertyType getParameterType() {
         return property.getParameterType();
     }
 

@@ -1,7 +1,7 @@
 package soya.framework.action.actions.flow;
 
 import soya.framework.action.ActionName;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyType;
 
 import java.net.URI;
 import java.util.*;
@@ -41,7 +41,7 @@ public final class Pipeline {
         return parameters.get(name).type;
     }
 
-    public ActionParameterType parameterType(String name) {
+    public ActionPropertyType parameterType(String name) {
         if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name +
                     "' is not defined for " + actionName);
@@ -103,7 +103,7 @@ public final class Pipeline {
 
         private Class<?> type;
 
-        private ActionParameterType parameterType;
+        private ActionPropertyType parameterType;
 
         private String referredTo;
         private boolean required;
@@ -127,7 +127,7 @@ public final class Pipeline {
 
         private final Class<?> type;
 
-        private final ActionParameterType parameterType;
+        private final ActionPropertyType parameterType;
 
         private final String referredTo;
         private final boolean required;
@@ -135,7 +135,7 @@ public final class Pipeline {
 
         DynamicParameter(String name,
                          Class<?> type,
-                         ActionParameterType parameterType,
+                         ActionPropertyType parameterType,
                          String referredTo,
                          boolean required,
                          String description) {

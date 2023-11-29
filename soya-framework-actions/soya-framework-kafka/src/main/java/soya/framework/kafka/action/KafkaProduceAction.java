@@ -2,27 +2,27 @@ package soya.framework.kafka.action;
 
 import org.apache.kafka.clients.producer.RecordMetadata;
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 
 
 @ActionDefinition(domain = "kafka",
         name = "produce")
 public class KafkaProduceAction extends KafkaProducerAction<RecordMetadata> {
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
     protected String topic;
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     protected Integer partition;
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     protected String keySerializer;
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     protected String valueSerializer;
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.INPUT,
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.INPUT,
             description = "Message for produce",
             required = true)
     protected String message;

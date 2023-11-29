@@ -1,7 +1,7 @@
 package soya.framework.action.actions.text;
 
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
@@ -9,13 +9,13 @@ import java.util.concurrent.Callable;
 public abstract class TextUtilAction implements Callable<String> {
     public static final Charset DEFAULT_ENCODING = Charset.defaultCharset();
 
-    @ActionParameterDefinition(
-            parameterType = ActionParameterType.ATTRIBUTE
+    @ActionPropertyDefinition(
+            propertyType = ActionPropertyType.ATTRIBUTE
     )
     protected String encoding;
 
-    @ActionParameterDefinition(
-            parameterType = ActionParameterType.INPUT
+    @ActionPropertyDefinition(
+            propertyType = ActionPropertyType.INPUT
     )
     protected String text;
 

@@ -1,8 +1,8 @@
 package soya.framework.action.actions.jdbc;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 
 @ActionDefinition(
         domain = "jdbc",
@@ -10,13 +10,13 @@ import soya.framework.action.ActionParameterType;
 )
 public class DefaultJdbcAction extends JdbcAction<String> {
 
-    @ActionParameterDefinition(
-            parameterType = ActionParameterType.INPUT
+    @ActionPropertyDefinition(
+            propertyType = ActionPropertyType.INPUT
     )
     private String script;
 
-    @ActionParameterDefinition(
-            parameterType = ActionParameterType.WIRED_VALUE,
+    @ActionPropertyDefinition(
+            propertyType = ActionPropertyType.WIRED_VALUE,
             referredTo = "true"
     )
     private boolean autoCommit;

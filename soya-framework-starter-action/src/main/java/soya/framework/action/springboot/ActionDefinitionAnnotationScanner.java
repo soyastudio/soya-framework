@@ -55,11 +55,11 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
                 .actionType(actionType)
                 .actionName(ActionName.create(annotation.domain(), annotation.name()));
         if (DynaAction.class.isAssignableFrom(actionType)) {
-            Arrays.stream(annotation.parameters()).forEach(p -> {
+            Arrays.stream(annotation.properties()).forEach(p -> {
                 builder.addProperty(ActionProperty.builder()
                         .name(p.name())
                         .type(DefaultUtils.isDefaultType(p.type())? Object.class : DefaultUtils.getDefaultType(p.type()))
-                        .parameterType(p.parameterType())
+                        .parameterType(p.propertyType())
                         .referredTo(p.referredTo())
                         .required(p.required())
                         .description(p.description())
@@ -71,13 +71,13 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
             Arrays.stream(fields).forEach(field -> {
                 if (!Modifier.isFinal(field.getModifiers())
                         && !Modifier.isStatic(field.getModifiers())
-                        && field.getAnnotation(ActionParameterDefinition.class) != null) {
-                    builder.addProperty(field, field.getAnnotation(ActionParameterDefinition.class));
+                        && field.getAnnotation(ActionPropertyDefinition.class) != null) {
+                    builder.addProperty(field, field.getAnnotation(ActionPropertyDefinition.class));
                 }
             });
 
             // Override From ActionDefinition annotation:
-            Arrays.stream(annotation.parameters()).forEach(e -> {
+            Arrays.stream(annotation.properties()).forEach(e -> {
                 Field field = ReflectUtils.findField(actionType, e.name());
                 builder.addProperty(field, e);
             });

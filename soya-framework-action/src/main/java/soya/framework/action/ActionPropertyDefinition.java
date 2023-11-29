@@ -7,13 +7,13 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ActionParameterDefinition {
+public @interface ActionPropertyDefinition {
 
     String name() default "";
 
     Class<?> type() default DefaultUtils.DEFAULT_TYPE.class;
 
-    ActionParameterType parameterType();
+    ActionPropertyType propertyType();
 
     String referredTo() default "";
 

@@ -54,7 +54,7 @@ public final class ActionClass {
         return params.keySet().toArray(new String[params.size()]);
     }
 
-    public ActionParameterType parameterType(String name) {
+    public ActionPropertyType parameterType(String name) {
         if (!params.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
         }
@@ -146,13 +146,13 @@ public final class ActionClass {
                         if (!e.getParameterType().isWired()) {
                             // set from input:
 
-                        } else if (ActionParameterType.WIRED_VALUE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getParameterType())) {
                             value = e.getReferredTo();
 
-                        } else if (ActionParameterType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getParameterType())) {
                             value = actionContext.getProperty(e.getReferredTo(), e.isRequired());
 
-                        } else if (ActionParameterType.WIRED_SERVICE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getParameterType())) {
                             try {
                                 // FIXME:
                                 value = actionContext.getService(e.getReferredTo(), e.getType());
@@ -160,7 +160,7 @@ public final class ActionClass {
                             } catch (NotFoundException ex) {
                                 throw new RuntimeException(ex);
                             }
-                        } else if (ActionParameterType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getParameterType())) {
                             // FIXME:
                             value = actionContext.getResource(e.getReferredTo(), e.getType());
 
@@ -178,20 +178,20 @@ public final class ActionClass {
                         if (!e.getParameterType().isWired()) {
 
 
-                        } else if (ActionParameterType.WIRED_VALUE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getParameterType())) {
                             value = ConvertUtils.convert(e.getReferredTo(), field.getType());
 
-                        } else if (ActionParameterType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getParameterType())) {
                             value = ConvertUtils.convert(actionContext.getProperty(e.getReferredTo(), e.isRequired()), field.getType());
 
-                        } else if (ActionParameterType.WIRED_SERVICE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getParameterType())) {
                             try {
                                 // FIXME:
                                 value = actionContext.getService(e.getReferredTo(), field.getType());
                             } catch (NotFoundException ex) {
                                 throw new RuntimeException(ex);
                             }
-                        } else if (ActionParameterType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getParameterType())) {
                             // FIXME:
                             value = actionContext.getResource(e.getReferredTo(), field.getType());
 

@@ -1,7 +1,7 @@
 package soya.framework.kafka.action;
 
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
 import soya.framework.context.ServiceLocatorSingleton;
@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 public abstract class KafkaAction<T> implements Callable<T> {
 
-    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
     protected String kafkaClientName;
 
     protected KafkaClient getKafkaClient() {

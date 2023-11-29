@@ -1,16 +1,16 @@
 package soya.framework.action.actions.test;
 
 import soya.framework.action.ActionDefinition;
-import soya.framework.action.ActionParameterDefinition;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.action.actions.AnnotatedDynaAction;
 
 @ActionDefinition(
         domain = "test",
         name = "dynaActionTest",
-        parameters = {
-                @ActionParameterDefinition(name = "value",
-                        parameterType = ActionParameterType.WIRED_VALUE,
+        properties = {
+                @ActionPropertyDefinition(name = "value",
+                        propertyType = ActionPropertyType.WIRED_VALUE,
                         referredTo = "xyz")
         }
 )

@@ -1,7 +1,7 @@
 package soya.framework.action.actions.flow;
 
 import soya.framework.action.ActionName;
-import soya.framework.action.ActionParameterType;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.action.DynaAction;
 import soya.framework.commons.conversion.ConvertUtils;
 
@@ -31,7 +31,7 @@ public abstract class PipelineAction<T> implements DynaAction, Callable<T> {
     }
 
     @Override
-    public ActionParameterType parameterType(String paramName) {
+    public ActionPropertyType parameterType(String paramName) {
         return pipeline.parameterType(paramName);
     }
 
