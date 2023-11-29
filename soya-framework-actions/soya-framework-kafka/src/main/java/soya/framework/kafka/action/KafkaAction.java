@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 public abstract class KafkaAction<T> implements Callable<T> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     protected String kafkaClientName;
 
     protected KafkaClient getKafkaClient() {

@@ -13,36 +13,36 @@ import java.util.concurrent.Callable;
         name = "field-annotation",
         parameters = {
                 @ActionParameterDefinition(name = "value",
-                        type = ActionParameterType.WIRED_VALUE,
+                        parameterType = ActionParameterType.WIRED_VALUE,
                         referredTo = "xyz")
         }
 )
 public class TestAction implements Callable<Object> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     private String property;
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     private String value;
 
-    @ActionParameterDefinition(type = ActionParameterType.INPUT)
+    @ActionParameterDefinition(parameterType = ActionParameterType.INPUT)
     private Object input;
 
-    @ActionParameterDefinition(type = ActionParameterType.WIRED_SERVICE,
+    @ActionParameterDefinition(parameterType = ActionParameterType.WIRED_SERVICE,
             referredTo = "actionContext")
     private ActionContext service;
 
-    @ActionParameterDefinition(type = ActionParameterType.WIRED_RESOURCE,
+    @ActionParameterDefinition(parameterType = ActionParameterType.WIRED_RESOURCE,
             referredTo = "invoke:java.util.Date")
             //referredTo = "invoke:soya.framework.commons.util.DateTimeUtils/current")
     private Resource resource;
 
-    @ActionParameterDefinition(type = ActionParameterType.WIRED_RESOURCE,
+    @ActionParameterDefinition(parameterType = ActionParameterType.WIRED_RESOURCE,
             referredTo = "classpath:banner.txt")
     //referredTo = "invoke:soya.framework.commons.util.DateTimeUtils/current")
     private String banner;
 
-    @ActionParameterDefinition(type = ActionParameterType.WIRED_PROPERTY,
+    @ActionParameterDefinition(parameterType = ActionParameterType.WIRED_PROPERTY,
             referredTo = "server.port")
     private Object configuration;
 

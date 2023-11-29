@@ -1,7 +1,7 @@
 package soya.framework.action.actions.dispatch;
 
 import soya.framework.action.actions.AnnotatedDynaAction;
-import soya.framework.action.util.ConvertUtils;
+import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.util.URIUtils;
 
 import java.lang.reflect.Method;

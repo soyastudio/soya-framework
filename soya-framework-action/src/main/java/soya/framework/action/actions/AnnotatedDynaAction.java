@@ -3,6 +3,7 @@ package soya.framework.action.actions;
 import soya.framework.action.ActionDefinition;
 import soya.framework.action.ActionParameter;
 import soya.framework.action.ActionProperty;
+import soya.framework.commons.util.DefaultUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +23,8 @@ public abstract class AnnotatedDynaAction<T> extends DynaActionBase<T> {
         Arrays.stream(annotation.parameters()).forEach(p -> {
             list.add(ActionProperty.builder()
                     .name(p.name())
-                    .type(Object.class)
-                    .parameterType(p.type())
+                    .type(DefaultUtils.isDefaultType(p.type())? Object.class : p.type())
+                    .parameterType(p.parameterType())
                     .referredTo(p.referredTo())
                     .required(p.required())
                     .description(p.description())

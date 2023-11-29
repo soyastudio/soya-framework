@@ -10,7 +10,7 @@ import soya.framework.action.ActionParameterType;
 )
 public class ReadFileAction extends FileAction<String> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     private String parser;
     @Override
     public String call() throws Exception {

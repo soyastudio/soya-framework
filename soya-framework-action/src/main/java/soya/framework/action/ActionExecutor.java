@@ -1,6 +1,5 @@
 package soya.framework.action;
 
-import soya.framework.action.util.ConvertUtils;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
@@ -12,16 +11,16 @@ import java.util.concurrent.Future;
 public final class ActionExecutor<T> {
 
     private final ActionName actionName;
-    private Map<String, Property> properties = new HashMap<>();
+    private Map<String, ActionParameter> parameters = new HashMap<>();
     private String inputParamName;
 
     private Callable<?> callable;
 
-    ActionExecutor(ActionName actionName, Callable<?> callable, ActionProperty[] parameters) {
+    ActionExecutor(ActionName actionName, Callable<?> callable, ActionProperty[] properties) {
         this.actionName = actionName;
-        Arrays.stream(parameters).forEach(e -> {
-            properties.put(e.getName(), new Property(e));
-            if(e.getParameterType().equals(ActionParameterType.INPUT)) {
+        Arrays.stream(properties).forEach(e -> {
+            parameters.put(e.getName(), new ActionParameter(e));
+            if (e.getParameterType().equals(ActionParameterType.INPUT)) {
                 inputParamName = e.getName();
             }
         });
@@ -34,7 +33,7 @@ public final class ActionExecutor<T> {
     }
 
     public String[] getParameterNames() {
-        List<String> list = new ArrayList<>(properties.keySet());
+        List<String> list = new ArrayList<>(parameters.keySet());
         return list.toArray(new String[list.size()]);
     }
 
@@ -43,30 +42,29 @@ public final class ActionExecutor<T> {
     }
 
     public Class<?> getParameterType(String name) {
-        if (!properties.containsKey(name)) {
+        if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined: " + name);
         }
-        return properties.get(name).parameter.getType();
+        return parameters.get(name).getType();
     }
 
     public boolean isParameterRequired(String name) {
-        if (!properties.containsKey(name)) {
+        if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined: " + name);
         }
-        return properties.get(name).parameter.isRequired();
+        return parameters.get(name).isRequired();
     }
 
     public void set(String name, String value) {
-        if (!properties.containsKey(name)) {
+        if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined: " + name);
         }
 
-        Property property = properties.get(name);
-        property.set(ConvertUtils.convert(value, property.parameter.getType()));
+        parameters.get(name).set(value);
     }
 
     public ActionExecutor<T> reset() {
-        properties.entrySet().forEach(e -> {
+        parameters.entrySet().forEach(e -> {
             e.getValue().reset();
         });
         return this;
@@ -83,28 +81,28 @@ public final class ActionExecutor<T> {
     }
 
     private void populate(Callable<?> callable) {
-        Iterator<Property> iterator = properties.values().iterator();
+        Iterator<ActionParameter> iterator = parameters.values().iterator();
         while (iterator.hasNext()) {
-            Property property = iterator.next();
-            if (property.isRequired() && property.value == null) {
-                throw new IllegalStateException("Property is required: " + property.getName());
+            ActionParameter parameter = iterator.next();
+            if (parameter.isRequired() && parameter.get() == null) {
+                throw new IllegalStateException("Property is required: " + parameter.getName());
             }
         }
 
         Class<? extends Callable<?>> actionType = (Class<? extends Callable<?>>) callable.getClass();
-        if(DynaAction.class.isAssignableFrom(actionType)) {
+        if (DynaAction.class.isAssignableFrom(actionType)) {
             DynaAction dynamicAction = (DynaAction) callable;
-            properties.entrySet().forEach(e -> {
-                Object value = properties.get(e.getKey()).value;
+            parameters.entrySet().forEach(e -> {
+                Object value = parameters.get(e.getKey()).get();
                 if (value != null) {
                     dynamicAction.setParameter(e.getKey(), value);
                 }
             });
 
         } else {
-            properties.entrySet().forEach(e -> {
+            parameters.entrySet().forEach(e -> {
                 Field field = ReflectUtils.findField(actionType, e.getKey());
-                Object value = properties.get(field.getName()).value;
+                Object value = parameters.get(field.getName()).get();
                 if (value != null) {
                     field.setAccessible(true);
                     try {
@@ -115,46 +113,6 @@ public final class ActionExecutor<T> {
                     }
                 }
             });
-        }
-    }
-
-
-    static class Property {
-        private ActionProperty parameter;
-
-        private Object value;
-
-        public Property(ActionProperty parameter) {
-            this.parameter = parameter;
-
-        }
-
-        String getName() {
-            return parameter.getName();
-        }
-
-        Class<?> getType() {
-            return parameter.getType();
-        }
-
-        ActionParameterType getParameterType() {
-            return parameter.getParameterType();
-        }
-
-        String getReferredTo() {
-            return parameter.getReferredTo();
-        }
-
-        boolean isRequired() {
-            return parameter.isRequired();
-        }
-
-        void set(Object value) {
-            this.value = value;
-        }
-
-        void reset() {
-            this.value = null;
         }
     }
 

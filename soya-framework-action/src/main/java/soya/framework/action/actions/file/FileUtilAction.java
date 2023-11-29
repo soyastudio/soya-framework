@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 
 public abstract class FileUtilAction<T> implements Callable<T> {
 
-    @ActionParameterDefinition(type = ActionParameterType.WIRED_PROPERTY,
+    @ActionParameterDefinition(parameterType = ActionParameterType.WIRED_PROPERTY,
             referredTo = "soya.framework.action.actions.file.base")
     protected File base;
 }

@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
         name = "admin-topics")
 public class KafkaTopicsAction extends KafkaAdminAction<String[]> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     private String query;
 
     @Override

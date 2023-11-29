@@ -1,6 +1,6 @@
 package soya.framework.action;
 
-import soya.framework.action.util.ConvertUtils;
+import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
@@ -22,6 +22,7 @@ public final class ActionClass {
     private final Class<? extends Callable> actionType;
     private final ActionName actionName;
     private final Map<String, ActionProperty> params;
+
     private final ActionProperty[] unwired;
 
     ActionClass(Class<? extends Callable> actionType, ActionName actionName, List<ActionProperty> parameters) {
@@ -159,7 +160,7 @@ public final class ActionClass {
                             }
                         } else if (ActionParameterType.WIRED_RESOURCE.equals(e.getParameterType())) {
                             // FIXME:
-
+                            value = actionContext.getResource(e.getReferredTo(), e.getType());
 
                         }
 

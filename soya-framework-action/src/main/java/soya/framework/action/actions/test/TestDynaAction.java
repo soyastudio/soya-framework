@@ -10,7 +10,7 @@ import soya.framework.action.actions.AnnotatedDynaAction;
         name = "dynaActionTest",
         parameters = {
                 @ActionParameterDefinition(name = "value",
-                        type = ActionParameterType.WIRED_VALUE,
+                        parameterType = ActionParameterType.WIRED_VALUE,
                         referredTo = "xyz")
         }
 )

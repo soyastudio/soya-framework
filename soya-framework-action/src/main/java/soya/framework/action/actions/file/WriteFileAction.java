@@ -10,7 +10,7 @@ import soya.framework.action.ActionParameterType;
 )
 public class WriteFileAction extends FileAction<String> {
 
-    @ActionParameterDefinition(type = ActionParameterType.INPUT,
+    @ActionParameterDefinition(parameterType = ActionParameterType.INPUT,
             required = true)
     private String content;
 

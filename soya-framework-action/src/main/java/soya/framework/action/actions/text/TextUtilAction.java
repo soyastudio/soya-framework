@@ -10,12 +10,12 @@ public abstract class TextUtilAction implements Callable<String> {
     public static final Charset DEFAULT_ENCODING = Charset.defaultCharset();
 
     @ActionParameterDefinition(
-            type = ActionParameterType.PROPERTY
+            parameterType = ActionParameterType.ATTRIBUTE
     )
     protected String encoding;
 
     @ActionParameterDefinition(
-            type = ActionParameterType.INPUT
+            parameterType = ActionParameterType.INPUT
     )
     protected String text;
 

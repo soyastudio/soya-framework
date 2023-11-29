@@ -12,8 +12,8 @@ import soya.framework.action.actions.dispatch.DispatchActionParameter;
         name = "dispatchActionTest",
         parameters = {
                 @ActionParameterDefinition(name = "value",
-                        type = ActionParameterType.WIRED_PROPERTY,
-                        referredTo = "albertsons.workspace.home")
+                        parameterType = ActionParameterType.WIRED_RESOURCE,
+                        referredTo = "classpath:banner.txt")
         }
 )
 @DispatchActionDefinition(uri = "class:soya.framework.action.actions.test.Utility?method=echo",

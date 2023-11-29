@@ -60,9 +60,9 @@ public class ActionRestAdapter implements RestActionLoader {
                         && !Modifier.isFinal(field.getModifiers())
                         && field.getAnnotation(ActionParameterDefinition.class) != null) {
                     ActionParameterDefinition parameter = field.getAnnotation(ActionParameterDefinition.class);
-                    if(!parameter.type().isWired()) {
+                    if(!parameter.parameterType().isWired()) {
                         builder.addParameter(field.getName(),
-                                getParamType(parameter.type()),
+                                getParamType(parameter.parameterType()),
                                 parameter.referredTo(),
                                 parameter.required(),
                                 parameter.description());

@@ -11,4 +11,5 @@ public interface DynaAction {
     void setParameter(String paramName, Object value);
 
     Object getParameter(String paramName);
+
 }

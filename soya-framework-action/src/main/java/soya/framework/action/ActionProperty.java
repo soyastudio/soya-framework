@@ -1,8 +1,10 @@
 package soya.framework.action;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public final class ActionProperty implements Serializable {
+
     private final String name;
     private final Class<?> type;
     private final ActionParameterType parameterType;

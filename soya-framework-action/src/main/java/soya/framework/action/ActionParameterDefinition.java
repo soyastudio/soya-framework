@@ -1,5 +1,7 @@
 package soya.framework.action;
 
+import soya.framework.commons.util.DefaultUtils;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
@@ -9,7 +11,9 @@ public @interface ActionParameterDefinition {
 
     String name() default "";
 
-    ActionParameterType type();
+    Class<?> type() default DefaultUtils.DEFAULT_TYPE.class;
+
+    ActionParameterType parameterType();
 
     String referredTo() default "";
 

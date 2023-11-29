@@ -1,4 +1,4 @@
-package soya.framework.action.flow;
+package soya.framework.action.actions.flow;
 
 import java.lang.annotation.*;
 

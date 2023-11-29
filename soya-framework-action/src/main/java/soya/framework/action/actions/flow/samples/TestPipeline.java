@@ -1,7 +1,7 @@
-package soya.framework.action.flow.samples;
+package soya.framework.action.actions.flow.samples;
 
-import soya.framework.action.flow.Pipeline;
-import soya.framework.action.flow.PipelineAction;
+import soya.framework.action.actions.flow.Pipeline;
+import soya.framework.action.actions.flow.PipelineAction;
 
 public class TestPipeline extends PipelineAction<String> {
 

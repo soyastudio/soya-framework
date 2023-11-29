@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 )
 public class FindServiceAction implements Callable<String> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY,
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE,
             required = true)
     private String type;
 

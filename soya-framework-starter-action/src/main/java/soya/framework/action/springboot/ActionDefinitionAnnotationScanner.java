@@ -4,6 +4,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import soya.framework.action.*;
+import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
@@ -45,7 +46,6 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
     }
 
     private ActionClass fromActionDefinition(Class<? extends Callable> actionType) {
-
         ActionDefinition annotation = actionType.getAnnotation(ActionDefinition.class);
         if (annotation == null) {
             throw new IllegalArgumentException();
@@ -58,8 +58,8 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
             Arrays.stream(annotation.parameters()).forEach(p -> {
                 builder.addProperty(ActionProperty.builder()
                         .name(p.name())
-                        .type(Object.class)
-                        .parameterType(p.type())
+                        .type(DefaultUtils.isDefaultType(p.type())? Object.class : DefaultUtils.getDefaultType(p.type()))
+                        .parameterType(p.parameterType())
                         .referredTo(p.referredTo())
                         .required(p.required())
                         .description(p.description())

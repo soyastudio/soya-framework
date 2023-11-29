@@ -2,7 +2,7 @@ package soya.framework.action.springboot;
 
 import soya.framework.action.ActionContext;
 import soya.framework.action.NotFoundException;
-import soya.framework.action.util.ConvertUtils;
+import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.io.Resource;
 import soya.framework.context.ServiceLocator;
 import soya.framework.context.ServiceLocatorSingleton;

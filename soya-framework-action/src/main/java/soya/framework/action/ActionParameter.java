@@ -1,6 +1,8 @@
 package soya.framework.action;
 
-public class ActionParameter {
+import soya.framework.commons.conversion.ConvertUtils;
+
+public final class ActionParameter {
 
     private final ActionProperty property;
     private Object value;
@@ -38,6 +40,10 @@ public class ActionParameter {
     }
 
     public void set(Object value) {
-        this.value = value;
+        this.value = ConvertUtils.convert(value, property.getType());
+    }
+
+    public void reset() {
+        this.value = null;
     }
 }

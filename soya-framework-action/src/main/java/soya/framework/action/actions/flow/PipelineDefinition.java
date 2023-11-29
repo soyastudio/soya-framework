@@ -1,4 +1,4 @@
-package soya.framework.action.flow;
+package soya.framework.action.actions.flow;
 
 import soya.framework.action.ActionParameterDefinition;
 

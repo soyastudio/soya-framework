@@ -1,5 +1,7 @@
 package soya.framework.action;
 
+import soya.framework.commons.util.DefaultUtils;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +31,8 @@ public class ActionClassBuilder {
     public ActionClassBuilder addProperty(Field field, ActionParameterDefinition annotation) {
         this.properties.add(ActionProperty.builder()
                 .name(field.getName())
-                .type(field.getType())
-                .parameterType(annotation.type())
+                .type(DefaultUtils.isDefaultType(annotation.type())? field.getType() : DefaultUtils.getDefaultType(field.getType()))
+                .parameterType(annotation.parameterType())
                 .referredTo(annotation.referredTo())
                 .required(annotation.required())
                 .description(annotation.description())

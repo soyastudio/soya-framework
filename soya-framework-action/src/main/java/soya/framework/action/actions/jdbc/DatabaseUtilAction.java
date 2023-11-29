@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 
 public abstract class DatabaseUtilAction<T> implements Callable<T> {
 
-    @ActionParameterDefinition(type = ActionParameterType.PROPERTY)
+    @ActionParameterDefinition(parameterType = ActionParameterType.ATTRIBUTE)
     protected String dataSourceName;
 
     protected DataSource getDataSource() {

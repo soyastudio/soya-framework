@@ -11,12 +11,12 @@ import soya.framework.action.ActionParameterType;
 public class DefaultJdbcAction extends JdbcAction<String> {
 
     @ActionParameterDefinition(
-            type = ActionParameterType.INPUT
+            parameterType = ActionParameterType.INPUT
     )
     private String script;
 
     @ActionParameterDefinition(
-            type = ActionParameterType.WIRED_VALUE,
+            parameterType = ActionParameterType.WIRED_VALUE,
             referredTo = "true"
     )
     private boolean autoCommit;
