@@ -132,6 +132,7 @@ public final class ActionClass {
     }
 
     static class DefaultActionFactory implements ActionFactory {
+
         @Override
         public Callable<?> create(ActionName actionName, ActionContext actionContext) {
             try {
@@ -143,7 +144,7 @@ public final class ActionClass {
                         DynaAction dynaAction = (DynaAction) callable;
                         Object value = null;
                         if (!e.getParameterType().isWired()) {
-
+                            // set from input:
 
                         } else if (ActionParameterType.WIRED_VALUE.equals(e.getParameterType())) {
                             value = e.getReferredTo();
@@ -154,6 +155,7 @@ public final class ActionClass {
                         } else if (ActionParameterType.WIRED_SERVICE.equals(e.getParameterType())) {
                             try {
                                 // FIXME:
+                                value = actionContext.getService(e.getReferredTo(), e.getType());
 
                             } catch (NotFoundException ex) {
                                 throw new RuntimeException(ex);

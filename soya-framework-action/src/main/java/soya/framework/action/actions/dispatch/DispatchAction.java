@@ -7,7 +7,6 @@ import soya.framework.commons.util.URIUtils;
 import java.lang.reflect.Method;
 import java.net.URI;
 
-
 public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
 
     private final MethodInvoker invoker;
