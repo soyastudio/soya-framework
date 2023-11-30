@@ -21,25 +21,25 @@ public final class ActionClass {
 
     private final Class<? extends Callable> actionType;
     private final ActionName actionName;
-    private final Map<String, ActionProperty> params;
 
-    private final ActionProperty[] unwired;
+    private final Map<String, ActionProperty> properties;
+    private final ActionProperty[] interactiveProperties;
 
-    ActionClass(Class<? extends Callable> actionType, ActionName actionName, List<ActionProperty> parameters) {
+    ActionClass(Class<? extends Callable> actionType, ActionName actionName, List<ActionProperty> actionProperties) {
         this.actionName = actionName;
         this.actionType = actionType;
 
         Map<String, ActionProperty> map = new LinkedHashMap<>();
         List<ActionProperty> unwiredList = new ArrayList<>();
-        parameters.forEach(e -> {
+        actionProperties.forEach(e -> {
             map.put(e.getName(), e);
             if (!e.getParameterType().isWired()) {
                 unwiredList.add(e);
             }
         });
 
-        this.params = Collections.unmodifiableMap(map);
-        this.unwired = unwiredList.toArray(new ActionProperty[unwiredList.size()]);
+        this.properties = Collections.unmodifiableMap(map);
+        this.interactiveProperties = unwiredList.toArray(new ActionProperty[unwiredList.size()]);
     }
 
     public Class<? extends Callable> getActionType() {
@@ -51,43 +51,43 @@ public final class ActionClass {
     }
 
     public String[] parameterNames() {
-        return params.keySet().toArray(new String[params.size()]);
+        return properties.keySet().toArray(new String[properties.size()]);
     }
 
     public ActionPropertyType parameterType(String name) {
-        if (!params.containsKey(name)) {
+        if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
         }
-        return params.get(name).getParameterType();
+        return properties.get(name).getParameterType();
     }
 
     public String referredTo(String name) {
-        if (!params.containsKey(name)) {
+        if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
         }
-        return params.get(name).getReferredTo();
+        return properties.get(name).getReferredTo();
     }
 
     public boolean required(String name) {
-        if (!params.containsKey(name)) {
+        if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
         }
-        return params.get(name).isRequired();
+        return properties.get(name).isRequired();
     }
 
     public String description(String name) {
-        if (!params.containsKey(name)) {
+        if (!properties.containsKey(name)) {
             throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
         }
-        return params.get(name).getDescription();
+        return properties.get(name).getDescription();
     }
 
     ActionProperty[] parameters() {
-        return params.values().toArray(new ActionProperty[params.size()]);
+        return properties.values().toArray(new ActionProperty[properties.size()]);
     }
 
     ActionProperty getParameter(String name) {
-        return params.get(name);
+        return properties.get(name);
     }
 
     static void register(ActionFactory factory) {
@@ -114,7 +114,7 @@ public final class ActionClass {
     }
 
     public ActionExecutor<?> newInstance(ActionContext actionContext) {
-        return new ActionExecutor(actionName, creators.get(actionName).create(actionName, actionContext), unwired);
+        return new ActionExecutor(actionName, creators.get(actionName).create(actionName, actionContext), interactiveProperties);
     }
 
     public static ActionName[] actionNames() {
