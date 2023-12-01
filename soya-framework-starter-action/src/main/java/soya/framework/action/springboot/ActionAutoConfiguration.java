@@ -29,13 +29,13 @@ public class ActionAutoConfiguration {
 
     @Bean
     ActionRegistration actionRegistration(ApplicationContext applicationContext) {
-        ActionRegistration registration = new ActionRegistration();
+        ActionRegistration.Builder builder = ActionRegistration.builder();
         if (properties.getScanPackages() != null) {
             String[] pkgs = properties.getScanPackages().split(",");
-            registration.load(new ActionDefinitionAnnotationScanner(pkgs));
+            builder.register(new ActionDefinitionAnnotationScanner(pkgs));
         }
 
-        return registration;
+        return builder.create();
     }
 
     @EventListener

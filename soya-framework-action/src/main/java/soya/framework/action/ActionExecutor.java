@@ -78,7 +78,6 @@ public final class ActionExecutor<T> {
                     dynamicAction.setParameter(e.getKey(), value);
                 }
             });
-
         } else {
             parameters.entrySet().forEach(e -> {
                 Field field = ReflectUtils.findField(actionType, e.getKey());
@@ -89,7 +88,6 @@ public final class ActionExecutor<T> {
                         field.set(callable, value);
                     } catch (IllegalAccessException ex) {
                         throw new RuntimeException(ex);
-
                     }
                 }
             });

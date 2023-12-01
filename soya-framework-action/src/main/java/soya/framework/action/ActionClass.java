@@ -74,7 +74,6 @@ public final class ActionClass {
                 return entry.getValue();
             }
         }
-
         return defaultActionFactory;
     }
 

@@ -7,6 +7,7 @@ import soya.framework.action.*;
 import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -24,7 +25,6 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
 
     @Override
     public Set<ActionClass> scan() {
-
         Set<ActionClass> actionClasses = new HashSet<>();
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(ActionDefinition.class, true, true));
