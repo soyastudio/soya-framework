@@ -3,61 +3,40 @@ package soya.framework.action;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 public final class ActionExecutor<T> {
 
+    private static Logger logger = Logger.getLogger(ActionExecutor.class.getName());
+
     private final ActionName actionName;
     private Map<String, ActionParameter> parameters = new HashMap<>();
-    private String inputParamName;
-
     private Callable<?> callable;
 
     ActionExecutor(ActionName actionName, Callable<?> callable, ActionProperty[] properties) {
         this.actionName = actionName;
+        this.callable = callable;
+
         Arrays.stream(properties).forEach(e -> {
             parameters.put(e.getName(), new ActionParameter(e));
-            if (e.getParameterType().equals(ActionPropertyType.INPUT)) {
-                inputParamName = e.getName();
-            }
         });
 
-        this.callable = callable;
     }
 
     public ActionName getActionName() {
         return actionName;
     }
 
-    public String[] getParameterNames() {
-        List<String> list = new ArrayList<>(parameters.keySet());
-        return list.toArray(new String[list.size()]);
-    }
-
-    public String getInputParameterName() {
-        return inputParamName;
-    }
-
-    public Class<?> getParameterType(String name) {
-        if (!parameters.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter is not defined: " + name);
-        }
-        return parameters.get(name).getType();
-    }
-
-    public boolean isParameterRequired(String name) {
-        if (!parameters.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter is not defined: " + name);
-        }
-        return parameters.get(name).isRequired();
-    }
-
     public void set(String name, String value) {
         if (!parameters.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter is not defined: " + name);
+            throw new IllegalArgumentException("Parameter is not defined of visible: " + name);
         }
 
         parameters.get(name).set(value);
@@ -67,6 +46,7 @@ public final class ActionExecutor<T> {
         parameters.entrySet().forEach(e -> {
             e.getValue().reset();
         });
+
         return this;
     }
 
@@ -115,5 +95,4 @@ public final class ActionExecutor<T> {
             });
         }
     }
-
 }

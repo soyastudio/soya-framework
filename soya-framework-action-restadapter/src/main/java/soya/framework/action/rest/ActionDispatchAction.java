@@ -37,7 +37,7 @@ public final class ActionDispatchAction extends DispatchAction<String> {
 
     @Override
     public String call() throws Exception {
-        ActionExecutor actionExecutor = actionClass.newInstance(actionContext());
+        ActionExecutor actionExecutor = actionClass.executor(actionContext());
         Arrays.stream(getPropertyNames()).forEach(pn -> {
             String value = (String) getPropertyValue(pn);
             if(value != null && value.trim().length() > 0) {

@@ -24,7 +24,7 @@ public abstract class AnnotatedDynaAction<T> extends DynaActionBase<T> {
             list.add(ActionProperty.builder()
                     .name(p.name())
                     .type(DefaultUtils.isDefaultType(p.type())? Object.class : p.type())
-                    .parameterType(p.propertyType())
+                    .propertyType(p.propertyType())
                     .referredTo(p.referredTo())
                     .required(p.required())
                     .description(p.description())

@@ -5,16 +5,19 @@ import java.io.Serializable;
 public final class ActionProperty implements Serializable {
 
     private final String name;
-    private final Class<?> type;
-    private final ActionPropertyType parameterType;
+    private final transient Class<?> _type;
+    private final String type;
+
+    private final ActionPropertyType propertyType;
     private final String referredTo;
     private final boolean required;
     private final String description;
 
-    private ActionProperty(String name, Class<?> type, ActionPropertyType parameterType, String referredTo, boolean required, String description) {
+    private ActionProperty(String name, Class<?> type, ActionPropertyType propertyType, String referredTo, boolean required, String description) {
         this.name = name;
-        this.type = type;
-        this.parameterType = parameterType;
+        this._type = type;
+        this.type = type.getName();
+        this.propertyType = propertyType;
         this.referredTo = referredTo;
         this.required = required;
         this.description = description;
@@ -24,12 +27,12 @@ public final class ActionProperty implements Serializable {
         return name;
     }
 
-    public Class<?> getType() {
-        return type;
+    public Class<?> get_type() {
+        return _type;
     }
 
-    public ActionPropertyType getParameterType() {
-        return parameterType;
+    public ActionPropertyType getPropertyType() {
+        return propertyType;
     }
 
     public String getReferredTo() {
@@ -52,7 +55,7 @@ public final class ActionProperty implements Serializable {
 
         private String name;
         private Class<?> type;
-        private ActionPropertyType parameterType;
+        private ActionPropertyType propertyType;
         private String referredTo;
         private boolean required;
         private String description;
@@ -70,8 +73,8 @@ public final class ActionProperty implements Serializable {
             return this;
         }
 
-        public Builder parameterType(ActionPropertyType parameterType) {
-            this.parameterType = parameterType;
+        public Builder propertyType(ActionPropertyType propertyType) {
+            this.propertyType = propertyType;
             return this;
         }
 
@@ -91,7 +94,7 @@ public final class ActionProperty implements Serializable {
         }
 
         public ActionProperty create() {
-            return new ActionProperty(name, type, parameterType, referredTo, required, description);
+            return new ActionProperty(name, type, propertyType, referredTo, required, description);
         }
     }
 }

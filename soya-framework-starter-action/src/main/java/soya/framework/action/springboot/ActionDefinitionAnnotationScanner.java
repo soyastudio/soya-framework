@@ -51,15 +51,15 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
             throw new IllegalArgumentException();
         }
 
-        ActionClassBuilder builder = new ActionClassBuilder()
+        ActionClass.Builder builder = ActionClass.builder()
                 .actionType(actionType)
                 .actionName(ActionName.create(annotation.domain(), annotation.name()));
         if (DynaAction.class.isAssignableFrom(actionType)) {
             Arrays.stream(annotation.properties()).forEach(p -> {
                 builder.addProperty(ActionProperty.builder()
                         .name(p.name())
-                        .type(DefaultUtils.isDefaultType(p.type())? Object.class : DefaultUtils.getDefaultType(p.type()))
-                        .parameterType(p.propertyType())
+                        .type(DefaultUtils.isDefaultType(p.type()) ? Object.class : DefaultUtils.getDefaultType(p.type()))
+                        .propertyType(p.propertyType())
                         .referredTo(p.referredTo())
                         .required(p.required())
                         .description(p.description())
@@ -84,6 +84,6 @@ public class ActionDefinitionAnnotationScanner implements ActionClassScanner {
 
         }
 
-        return builder.create(true);
+        return builder.create();
     }
 }

@@ -2,13 +2,14 @@ package soya.framework.action;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 public final class ActionName implements Comparable<ActionName>, Serializable {
     private final String domain;
     private final String name;
 
-    ActionName(String domain, String name) {
+    private ActionName(String domain, String name) {
 
         this.domain = domain;
         this.name = name;
@@ -36,6 +37,14 @@ public final class ActionName implements Comparable<ActionName>, Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public URI toURI() {
+        try {
+            return new URI(toString());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package soya.framework.action;
 
 import soya.framework.commons.conversion.ConvertUtils;
+import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
@@ -19,75 +20,39 @@ public final class ActionClass {
     private static Map<Class<?>, ActionFactory> factories = new HashMap<>();
     private static DefaultActionFactory defaultActionFactory = new DefaultActionFactory();
 
-    private final Class<? extends Callable> actionType;
-    private final ActionName actionName;
+    private final transient Class<? extends Callable> actionType;
+    private final transient ActionProperty[] interactiveProperties;
 
-    private final Map<String, ActionProperty> properties;
-    private final ActionProperty[] interactiveProperties;
+    private final String action;
+    private final ActionName name;
+    private final ActionProperty[] properties;
 
-    ActionClass(Class<? extends Callable> actionType, ActionName actionName, List<ActionProperty> actionProperties) {
-        this.actionName = actionName;
+    private ActionClass(Class<? extends Callable> actionType, ActionName name, ActionProperty[] actionProperties) {
+        this.name = name;
         this.actionType = actionType;
+        this.action = actionType.getName();
+        this.properties = actionProperties;
 
-        Map<String, ActionProperty> map = new LinkedHashMap<>();
-        List<ActionProperty> unwiredList = new ArrayList<>();
-        actionProperties.forEach(e -> {
-            map.put(e.getName(), e);
-            if (!e.getParameterType().isWired()) {
-                unwiredList.add(e);
+        List<ActionProperty> interactive = new ArrayList<>();
+        Arrays.stream(actionProperties).forEach(e -> {
+            if (!e.getPropertyType().isWired()) {
+                interactive.add(e);
             }
         });
 
-        this.properties = Collections.unmodifiableMap(map);
-        this.interactiveProperties = unwiredList.toArray(new ActionProperty[unwiredList.size()]);
+        this.interactiveProperties = interactive.toArray(new ActionProperty[interactive.size()]);
     }
 
     public Class<? extends Callable> getActionType() {
         return actionType;
     }
 
-    public ActionName getActionName() {
-        return actionName;
+    public ActionName getName() {
+        return name;
     }
 
-    public String[] parameterNames() {
-        return properties.keySet().toArray(new String[properties.size()]);
-    }
-
-    public ActionPropertyType parameterType(String name) {
-        if (!properties.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
-        }
-        return properties.get(name).getParameterType();
-    }
-
-    public String referredTo(String name) {
-        if (!properties.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
-        }
-        return properties.get(name).getReferredTo();
-    }
-
-    public boolean required(String name) {
-        if (!properties.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
-        }
-        return properties.get(name).isRequired();
-    }
-
-    public String description(String name) {
-        if (!properties.containsKey(name)) {
-            throw new IllegalArgumentException("Parameter '" + name + "' is not defined for action class: " + actionName);
-        }
-        return properties.get(name).getDescription();
-    }
-
-    ActionProperty[] parameters() {
-        return properties.values().toArray(new ActionProperty[properties.size()]);
-    }
-
-    ActionProperty getParameter(String name) {
-        return properties.get(name);
+    public ActionProperty[] getProperties() {
+        return properties;
     }
 
     static void register(ActionFactory factory) {
@@ -95,8 +60,8 @@ public final class ActionClass {
         factories.put(type, factory);
     }
 
-    static void register(ActionClass actionClass) {
-        ActionName actionName = actionClass.getActionName();
+    private static void register(ActionClass actionClass) {
+        ActionName actionName = actionClass.getName();
         if (!registrations.containsKey(actionName)) {
             registrations.put(actionName, actionClass);
         }
@@ -113,8 +78,12 @@ public final class ActionClass {
         return defaultActionFactory;
     }
 
-    public ActionExecutor<?> newInstance(ActionContext actionContext) {
-        return new ActionExecutor(actionName, creators.get(actionName).create(actionName, actionContext), interactiveProperties);
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public ActionExecutor<?> executor(ActionContext actionContext) {
+        return new ActionExecutor(name, creators.get(name).create(name, actionContext), interactiveProperties);
     }
 
     public static ActionName[] actionNames() {
@@ -139,30 +108,31 @@ public final class ActionClass {
                 ActionClass actionClass = ActionClass.forName(actionName);
                 Class<?> actionType = actionClass.getActionType();
                 Callable<?> callable = (Callable<?>) actionType.newInstance();
+
                 if (DynaAction.class.isAssignableFrom(actionType)) {
-                    Arrays.stream(actionClass.parameters()).forEach(e -> {
+                    Arrays.stream(actionClass.getProperties()).forEach(e -> {
                         DynaAction dynaAction = (DynaAction) callable;
                         Object value = null;
-                        if (!e.getParameterType().isWired()) {
+                        if (!e.getPropertyType().isWired()) {
                             // set from input:
 
-                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getPropertyType())) {
                             value = e.getReferredTo();
 
-                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getPropertyType())) {
                             value = actionContext.getProperty(e.getReferredTo(), e.isRequired());
 
-                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getPropertyType())) {
                             try {
                                 // FIXME:
-                                value = actionContext.getService(e.getReferredTo(), e.getType());
+                                value = actionContext.getService(e.getReferredTo(), e.get_type());
 
                             } catch (NotFoundException ex) {
                                 throw new RuntimeException(ex);
                             }
-                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getPropertyType())) {
                             // FIXME:
-                            value = actionContext.getResource(e.getReferredTo(), e.getType());
+                            value = actionContext.getResource(e.getReferredTo(), e.get_type());
 
                         }
 
@@ -172,26 +142,26 @@ public final class ActionClass {
                     });
 
                 } else {
-                    Arrays.stream(actionClass.parameters()).forEach(e -> {
+                    Arrays.stream(actionClass.getProperties()).forEach(e -> {
                         Field field = ReflectUtils.findField(actionType, e.getName());
                         Object value = null;
-                        if (!e.getParameterType().isWired()) {
+                        if (!e.getPropertyType().isWired()) {
 
 
-                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getPropertyType())) {
                             value = ConvertUtils.convert(e.getReferredTo(), field.getType());
 
-                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getPropertyType())) {
                             value = ConvertUtils.convert(actionContext.getProperty(e.getReferredTo(), e.isRequired()), field.getType());
 
-                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getPropertyType())) {
                             try {
                                 // FIXME:
                                 value = actionContext.getService(e.getReferredTo(), field.getType());
                             } catch (NotFoundException ex) {
                                 throw new RuntimeException(ex);
                             }
-                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getParameterType())) {
+                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getPropertyType())) {
                             // FIXME:
                             value = actionContext.getResource(e.getReferredTo(), field.getType());
 
@@ -216,4 +186,55 @@ public final class ActionClass {
         }
     }
 
+    public static class Builder {
+
+        private Class<? extends Callable> actionType;
+        private ActionName actionName;
+        private List<ActionProperty> properties = new ArrayList<>();
+
+        private Builder() {
+        }
+
+        public Builder actionType(Class<? extends Callable> type) {
+            this.actionType = type;
+            return this;
+        }
+
+        public Builder actionName(ActionName actionName) {
+            this.actionName = actionName;
+            return this;
+        }
+
+        public Builder addProperty(ActionProperty property) {
+            this.properties.add(property);
+            return this;
+        }
+
+        public Builder addProperty(Field field, ActionPropertyDefinition annotation) {
+            this.properties.add(ActionProperty.builder()
+                    .name(field.getName())
+                    .type(DefaultUtils.isDefaultType(annotation.type()) ? field.getType() : DefaultUtils.getDefaultType(field.getType()))
+                    .propertyType(annotation.propertyType())
+                    .referredTo(annotation.referredTo())
+                    .required(annotation.required())
+                    .description(annotation.description())
+                    .create());
+            return this;
+        }
+
+        public ActionClass create() {
+            Objects.requireNonNull(actionName);
+            Objects.requireNonNull(actionType);
+
+            if(registrations.containsKey(actionName)) {
+                throw new IllegalArgumentException("ActionClass already exists: " + actionName);
+            }
+
+            ActionClass actionClass = new ActionClass(actionType, actionName, properties.toArray(new ActionProperty[properties.size()]));
+            register(actionClass);
+
+            return actionClass;
+        }
+
+    }
 }

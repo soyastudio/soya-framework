@@ -1,6 +1,6 @@
 package soya.framework.action;
 
-public class ActionRegistration {
+public final class ActionRegistration {
 
     public ActionRegistration register(ActionFactory factory) {
         ActionClass.register(factory);
@@ -8,9 +8,7 @@ public class ActionRegistration {
     }
 
     public ActionRegistration load(ActionClassScanner scanner) {
-        scanner.scan().forEach(e -> {
-            ActionClass.register(e);
-        });
+        scanner.scan();
         return this;
     }
 }

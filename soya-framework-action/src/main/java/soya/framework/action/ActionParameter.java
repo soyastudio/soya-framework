@@ -16,11 +16,11 @@ public final class ActionParameter {
     }
 
     public Class<?> getType() {
-        return property.getType();
+        return property.get_type();
     }
 
     public ActionPropertyType getParameterType() {
-        return property.getParameterType();
+        return property.getPropertyType();
     }
 
     public String getReferredTo() {
@@ -40,7 +40,7 @@ public final class ActionParameter {
     }
 
     public void set(Object value) {
-        this.value = ConvertUtils.convert(value, property.getType());
+        this.value = ConvertUtils.convert(value, property.get_type());
     }
 
     public void reset() {

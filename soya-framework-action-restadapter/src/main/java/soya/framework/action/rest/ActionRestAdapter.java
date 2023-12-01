@@ -39,7 +39,7 @@ public class ActionRestAdapter implements RestActionLoader {
     }
 
     private ActionMapping map(ActionClass actionClass) {
-        ActionName actionName = actionClass.getActionName();
+        ActionName actionName = actionClass.getName();
 
         String id = "soya-" + actionName.getDomain().replace(".", "_").replace("-", "_") + "-" + actionName.getName();
 
@@ -72,14 +72,14 @@ public class ActionRestAdapter implements RestActionLoader {
             });
         }
 
-        Arrays.stream(actionClass.parameterNames()).forEach(param -> {
-            if(!actionClass.parameterType(param).isWired()) {
+        Arrays.stream(actionClass.getProperties()).forEach(property -> {
+            if(!property.getPropertyType().isWired()) {
 
-                builder.addParameter(param,
-                        getParamType(actionClass.parameterType(param)),
-                        actionClass.referredTo(param),
-                        actionClass.required(param),
-                        actionClass.description(param));
+                builder.addParameter(property.getName(),
+                        getParamType(property.getPropertyType()),
+                        property.getReferredTo(),
+                        property.isRequired(),
+                        property.getDescription());
 
             }
         });
