@@ -6,6 +6,7 @@ import soya.framework.commons.util.URIUtils;
 
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
 
@@ -19,7 +20,26 @@ public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
         }
 
         try {
+            URI uri = new URI(dispatch.uri());
+            String schema = uri.getScheme();
+
+            if(schema.equals(ActionMethodInvoker.schema)) {
+
+            } else if(schema.equals(BeanMethodInvoker.schema)) {
+
+            } else if(schema.equals(StaticMethodInvoker.schema)) {
+
+            } else {
+                throw new IllegalArgumentException("URI is not supported: " + dispatch.uri());
+            }
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        try {
             invoker = new MethodInvoker(dispatch);
+
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -36,6 +56,39 @@ public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
         }
 
         return (T) method.invoke(instance, values);
+    }
+
+    static class ActionMethodInvoker {
+        private static String schema = "action";
+
+    }
+
+    static class BeanMethodInvoker {
+        private static String schema = "bean";
+
+    }
+
+    static class StaticMethodInvoker {
+        private static String schema = "class";
+
+    }
+
+    static class  Invoker {
+
+        private String type;
+        private String methodName;
+        private Class<?>[] parameterTypes;
+        private String[] parameterMappings;
+
+        protected Method method;
+
+         protected Invoker(String type, String methodName, Class<?>[] parameterTypes, String[] parameterMappings) {
+            this.type = type;
+            this.methodName = methodName;
+            this.parameterTypes = parameterTypes;
+            this.parameterMappings = parameterMappings;
+        }
+
     }
 
     static class MethodInvoker {
