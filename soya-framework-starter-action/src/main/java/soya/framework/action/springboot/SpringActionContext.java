@@ -1,9 +1,10 @@
 package soya.framework.action.springboot;
 
 import soya.framework.action.ActionContext;
-import soya.framework.action.NotFoundException;
+import soya.framework.action.ActionContextException;
 import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.io.Resource;
+import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
 import soya.framework.context.ServiceLocatorSingleton;
 
@@ -15,16 +16,26 @@ import java.nio.charset.Charset;
 public class SpringActionContext implements ActionContext {
 
     @Override
-    public String getProperty(String propName, boolean required) throws NotFoundException {
-        String property = serviceLocator().getProperty(propName);
-        if (property == null && required) {
-            throw new NotFoundException("");
+    public String getProperty(String propName, boolean required) throws ActionContextException {
+        try {
+            String property = serviceLocator().getProperty(propName);
+            if (property == null && required) {
+                throw new ActionContextException("Required property is not found: " + propName);
+            }
+
+            return property;
+
+        } catch (ServiceLocateException e) {
+            if(required) {
+                throw new ActionContextException("Required property is not found: " + propName);
+            }
+
+            return null;
         }
-        return property;
     }
 
     @Override
-    public <T> T getService(String name, Class<T> type) throws NotFoundException {
+    public <T> T getService(String name, Class<T> type) throws ActionContextException {
         try {
             if (name == null || name.isEmpty()) {
                 return serviceLocator().getService(type);
@@ -32,7 +43,7 @@ public class SpringActionContext implements ActionContext {
                 return serviceLocator().getService(name, type);
             }
         } catch (Exception e) {
-            throw new NotFoundException(e);
+            throw new ActionContextException(e);
         }
     }
 

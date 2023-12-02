@@ -10,7 +10,7 @@ import java.util.concurrent.Callable;
 
 @ActionDefinition(
         domain = "reflect",
-        name = "domains"
+        name = "action-domains"
 )
 public class ActionDomainsAction implements Callable<String[]> {
     @Override

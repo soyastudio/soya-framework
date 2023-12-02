@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 public abstract class KafkaAction<T> implements Callable<T> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
     protected String kafkaClientName;
 
     protected KafkaClient getKafkaClient() {

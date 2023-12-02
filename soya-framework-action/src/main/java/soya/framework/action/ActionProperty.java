@@ -27,7 +27,7 @@ public final class ActionProperty implements Serializable {
         return name;
     }
 
-    public Class<?> get_type() {
+    public Class<?> getType() {
         return _type;
     }
 

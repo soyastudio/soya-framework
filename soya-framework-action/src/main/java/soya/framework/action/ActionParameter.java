@@ -16,7 +16,7 @@ public final class ActionParameter {
     }
 
     public Class<?> getType() {
-        return property.get_type();
+        return property.getType();
     }
 
     public ActionPropertyType getParameterType() {
@@ -40,7 +40,7 @@ public final class ActionParameter {
     }
 
     public void set(Object value) {
-        this.value = ConvertUtils.convert(value, property.get_type());
+        this.value = ConvertUtils.convert(value, property.getType());
     }
 
     public void reset() {

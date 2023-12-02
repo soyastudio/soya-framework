@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
 
 @ActionDefinition(
         domain = "reflect",
-        name = "action"
+        name = "action-details"
 )
 public class ActionDetailsAction implements Callable<String> {
 

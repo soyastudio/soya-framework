@@ -107,80 +107,60 @@ public final class ActionClass {
                 ActionClass actionClass = ActionClass.forName(actionName);
                 Class<?> actionType = actionClass.getActionType();
                 Callable<?> callable = (Callable<?>) actionType.newInstance();
-
-                if (DynaAction.class.isAssignableFrom(actionType)) {
-                    Arrays.stream(actionClass.getProperties()).forEach(e -> {
-                        DynaAction dynaAction = (DynaAction) callable;
-                        Object value = null;
-                        if (!e.getPropertyType().isWired()) {
-                            // set from input:
-
-                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getPropertyType())) {
-                            value = e.getReferredTo();
-
-                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getPropertyType())) {
-                            value = actionContext.getProperty(e.getReferredTo(), e.isRequired());
-
-                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getPropertyType())) {
-                            try {
-                                // FIXME:
-                                value = actionContext.getService(e.getReferredTo(), e.get_type());
-
-                            } catch (NotFoundException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getPropertyType())) {
-                            // FIXME:
-                            value = actionContext.getResource(e.getReferredTo(), e.get_type());
-
-                        }
-
-                        if (value != null) {
-                            dynaAction.setParameter(e.getName(), value);
-                        }
-                    });
-
-                } else {
-                    Arrays.stream(actionClass.getProperties()).forEach(e -> {
-                        Field field = ReflectUtils.findField(actionType, e.getName());
-                        Object value = null;
-                        if (!e.getPropertyType().isWired()) {
-
-
-                        } else if (ActionPropertyType.WIRED_VALUE.equals(e.getPropertyType())) {
-                            value = ConvertUtils.convert(e.getReferredTo(), field.getType());
-
-                        } else if (ActionPropertyType.WIRED_PROPERTY.equals(e.getPropertyType())) {
-                            value = ConvertUtils.convert(actionContext.getProperty(e.getReferredTo(), e.isRequired()), field.getType());
-
-                        } else if (ActionPropertyType.WIRED_SERVICE.equals(e.getPropertyType())) {
-                            try {
-                                // FIXME:
-                                value = actionContext.getService(e.getReferredTo(), field.getType());
-                            } catch (NotFoundException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        } else if (ActionPropertyType.WIRED_RESOURCE.equals(e.getPropertyType())) {
-                            // FIXME:
-                            value = actionContext.getResource(e.getReferredTo(), field.getType());
-
-                        }
-
-                        if (value != null) {
-                            field.setAccessible(true);
-                            try {
-                                field.set(callable, value);
-                            } catch (IllegalAccessException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }
-                    });
-                }
+                Arrays.stream(actionClass.getProperties()).forEach(e -> {
+                    if (e.getPropertyType().isWired()) {
+                        setProperty(e.getName(), wiredValue(e, actionContext), callable);
+                    }
+                });
 
                 return callable;
 
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
+            }
+        }
+
+        private void setProperty(String name, Object value, Callable<?> callable) {
+            if (value == null) {
+                return;
+
+            } else if (callable instanceof DynaAction) {
+                DynaAction dynaAction = (DynaAction) callable;
+                dynaAction.setParameter(name, value);
+
+            } else {
+                try {
+                    Field field = ReflectUtils.findField(callable.getClass(), name);
+                    field.setAccessible(true);
+                    field.set(callable, value);
+
+                } catch (IllegalAccessException e) {
+                    throw new IllegalArgumentException(e);
+                }
+            }
+        }
+
+        private Object wiredValue(ActionProperty property, ActionContext actionContext) {
+            try {
+                if (ActionPropertyType.WIRED_VALUE.equals(property.getPropertyType())) {
+                    return ConvertUtils.convert(property.getReferredTo(), property.getType());
+
+                } else if (ActionPropertyType.WIRED_PROPERTY.equals(property.getPropertyType())) {
+                    return ConvertUtils.convert(actionContext.getProperty(property.getReferredTo(), property.isRequired()), property.getType());
+
+                } else if (ActionPropertyType.WIRED_SERVICE.equals(property.getPropertyType())) {
+                    return actionContext.getService(property.getReferredTo(), property.getType());
+
+                } else if (ActionPropertyType.WIRED_RESOURCE.equals(property.getPropertyType())) {
+                    return actionContext.getResource(property.getReferredTo(), property.getType());
+
+                } else {
+                    return null;
+
+                }
+            } catch (ActionContextException ex) {
+                throw new RuntimeException(ex);
+
             }
         }
     }
@@ -225,7 +205,7 @@ public final class ActionClass {
             Objects.requireNonNull(actionName);
             Objects.requireNonNull(actionType);
 
-            if(registrations.containsKey(actionName)) {
+            if (registrations.containsKey(actionName)) {
                 throw new IllegalArgumentException("ActionClass already exists: " + actionName);
             }
 
