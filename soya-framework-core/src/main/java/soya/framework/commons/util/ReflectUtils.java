@@ -86,5 +86,18 @@ public class ReflectUtils {
         return null;
     }
 
+    public static Method findMethod(Class<?> cls, String methodName, Class<?>[] parameterTypes) {
+        Class parent = cls;
+        while (!parent.getName().equals("java.lang.Object")) {
+            try {
+                return parent.getDeclaredMethod(methodName, parameterTypes);
+            } catch (NoSuchMethodException e) {
+                parent = cls.getSuperclass();
+            }
+        }
+
+        return null;
+    }
+
 
 }

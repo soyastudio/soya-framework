@@ -8,8 +8,6 @@ import java.lang.annotation.*;
 public @interface DispatchActionParameter {
     Class<?> type();
 
-    Class<?> implType();
-
     String actionParameter();
 
 }

@@ -31,7 +31,7 @@ public abstract class PipelineAction<T> implements DynaAction, Callable<T> {
     }
 
     @Override
-    public ActionPropertyType parameterType(String paramName) {
+    public ActionPropertyType propertyType(String paramName) {
         return pipeline.parameterType(paramName);
     }
 

@@ -125,6 +125,7 @@ public final class ActionClass {
                 return;
 
             } else if (callable instanceof DynaAction) {
+
                 DynaAction dynaAction = (DynaAction) callable;
                 dynaAction.setParameter(name, value);
 

@@ -3,7 +3,7 @@ package soya.framework.commons.conversion.converters;
 import soya.framework.commons.conversion.ConversionException;
 import soya.framework.commons.conversion.Converter;
 
-class ClassConverter implements Converter<Class> {
+public class ClassConverter implements Converter<Class> {
     ClassConverter() {
     }
 

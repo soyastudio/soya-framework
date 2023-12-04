@@ -12,13 +12,14 @@ import soya.framework.action.actions.dispatch.DispatchActionParameter;
         name = "dispatchActionTest",
         properties = {
                 @ActionPropertyDefinition(name = "value",
+                        type = String.class,
                         propertyType = ActionPropertyType.WIRED_RESOURCE,
                         referredTo = "classpath:banner.txt")
         }
 )
-@DispatchActionDefinition(uri = "class:soya.framework.action.actions.test.Utility?method=echo",
+@DispatchActionDefinition(uri = "bean:com.albertsons.workspace.configuration.EchoService?method=echo",
         parameters = {
-                @DispatchActionParameter(type = String.class, implType = String.class, actionParameter = "value")
+                @DispatchActionParameter(type = String.class, actionParameter = "value")
         }
 )
 public class TestDispatchAction extends DispatchAction<Object> {

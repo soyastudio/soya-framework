@@ -19,7 +19,15 @@ public abstract class DynaActionBase<T> implements DynaAction, Callable<T> {
     }
 
     @Override
-    public ActionPropertyType parameterType(String paramName) {
+    public Class<?> parameterType(String paramName) {
+        if (!parameters.containsKey(paramName)) {
+            throw new IllegalArgumentException("Parameter is not defined: " + paramName);
+        }
+        return parameters.get(paramName).getType();
+    }
+
+    @Override
+    public ActionPropertyType propertyType(String paramName) {
         if (!parameters.containsKey(paramName)) {
             throw new IllegalArgumentException("Parameter is not defined: " + paramName);
         }
@@ -44,7 +52,9 @@ public abstract class DynaActionBase<T> implements DynaAction, Callable<T> {
 
     @Override
     public void setParameter(String paramName, Object value) {
-        ActionParameter parameter = parameters.get(paramName);
-        parameters.get(paramName).set(ConvertUtils.convert(value, parameter.getType()));
+        if (!parameters.containsKey(paramName)) {
+            throw new IllegalArgumentException("Parameter is not defined: " + paramName);
+        }
+        parameters.get(paramName).set(value);
     }
 }
