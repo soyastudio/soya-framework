@@ -1,7 +1,6 @@
 package soya.framework.action.actions.dispatch;
 
 import soya.framework.action.actions.AnnotatedDynaAction;
-import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.util.ReflectUtils;
 import soya.framework.commons.util.URIUtils;
 import soya.framework.context.ServiceLocateException;
@@ -32,8 +31,10 @@ public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
 
     @Override
     public T call() throws Exception {
+
         Method method = invoker.method;
         Object instance = invoker.instance;
+
         Object[] values = new Object[invoker.paramTypes.length];
         for (int i = 0; i < values.length; i++) {
             values[i] = getParameter(invoker.paramMappings[i]);
@@ -42,7 +43,7 @@ public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
         return (T) method.invoke(instance, values);
     }
 
-    static class MethodInvoker {
+    private static class MethodInvoker {
 
         private Method method;
         private Object instance;
@@ -50,7 +51,7 @@ public abstract class DispatchAction<T> extends AnnotatedDynaAction<T> {
         private Class<?>[] paramTypes;
         private String[] paramMappings;
 
-        MethodInvoker(DispatchActionDefinition dispatch) throws Exception {
+        private MethodInvoker(DispatchActionDefinition dispatch) throws Exception {
             DispatchActionParameter[] parameters = dispatch.parameters();
             int len = parameters.length;
             paramTypes = new Class[len];
