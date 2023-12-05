@@ -35,10 +35,21 @@ public class SpringActionContext implements ActionContext {
     }
 
     @Override
+    public Object getService(String name) throws ActionContextException {
+        try {
+            return serviceLocator().getService(name);
+
+        } catch (ServiceLocateException e) {
+            throw new ActionContextException(e);
+        }
+    }
+
+    @Override
     public <T> T getService(String name, Class<T> type) throws ActionContextException {
         try {
             if (name == null || name.isEmpty()) {
                 return serviceLocator().getService(type);
+
             } else {
                 return serviceLocator().getService(name, type);
             }

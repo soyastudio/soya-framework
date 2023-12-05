@@ -5,7 +5,7 @@ import soya.framework.action.ActionPropertyDefinition;
 import soya.framework.action.ActionPropertyType;
 import soya.framework.action.actions.dispatch.DispatchAction;
 import soya.framework.action.actions.dispatch.DispatchActionDefinition;
-import soya.framework.action.actions.dispatch.DispatchActionParameter;
+import soya.framework.action.actions.dispatch.PropertyMapping;
 
 @ActionDefinition(
         domain = "test",
@@ -18,8 +18,8 @@ import soya.framework.action.actions.dispatch.DispatchActionParameter;
         }
 )
 @DispatchActionDefinition(uri = "bean:com.albertsons.workspace.configuration.EchoService?method=echo",
-        parameters = {
-                @DispatchActionParameter(type = String.class, actionParameter = "value")
+        propertyMappings = {
+                @PropertyMapping(type = String.class, actionProperty = "value")
         }
 )
 public class TestDispatchAction extends DispatchAction<Object> {

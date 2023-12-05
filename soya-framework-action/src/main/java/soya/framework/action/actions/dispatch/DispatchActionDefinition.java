@@ -9,6 +9,6 @@ public @interface DispatchActionDefinition {
 
     String uri();
 
-    DispatchActionParameter[] parameters() default {};
+    PropertyMapping[] propertyMappings() default {};
 
 }

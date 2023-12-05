@@ -2,41 +2,29 @@ package soya.framework.springboot.starter;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import soya.framework.commons.io.NamespaceAware;
 import soya.framework.commons.io.Resource;
-import soya.framework.commons.io.ResourceLoader;
+import soya.framework.commons.io.ResourceException;
 import soya.framework.commons.io.resource.*;
 import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ApplicationContextServiceLocator implements ServiceLocator {
     private ApplicationContext applicationContext;
-    private Map<String, ResourceLoader> resourceLoaders = new HashMap<>();
-    private ResourceLoader defaultResourceLoader = new URLResourceLoader();
+
+    private DefaultResourceLoader resourceLoader;
 
     public ApplicationContextServiceLocator(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
 
-        // predefined resource loaders:
-        resourceLoaders.put(EnvironmentResource.SCHEMA, EnvironmentResource.loader());
-        resourceLoaders.put(ClasspathResource.SCHEMA, ClasspathResource.loader());
-        resourceLoaders.put(InvokeResource.SCHEMA, InvokeResource.loader());
-        resourceLoaders.put(TodoResource.SCHEMA, TodoResource.loader());
+        this.resourceLoader = (DefaultResourceLoader) DefaultResourceLoader.getInstance();
+        resourceLoader.register(EnvironmentResource.SCHEMA, EnvironmentResource.loader())
+                .register(ClasspathResource.SCHEMA, ClasspathResource.loader())
+                .register(InvokeResource.SCHEMA, InvokeResource.loader())
+                .register(TodoResource.SCHEMA, TodoResource.loader());
 
-        // additional resource loaders:
-        applicationContext.getBeansOfType(ResourceLoader.class).values().forEach(e -> {
-            if (e instanceof NamespaceAware) {
-                NamespaceAware namespaceAware = (NamespaceAware) e;
-                Arrays.stream(namespaceAware.getNamespaces()).forEach(n -> {
-                    resourceLoaders.put(n, e);
-                });
-            }
-        });
     }
 
     @Override
@@ -82,14 +70,21 @@ public class ApplicationContextServiceLocator implements ServiceLocator {
 
     @Override
     public String getProperty(String propName) throws ServiceLocateException {
-        return applicationContext.getEnvironment().getProperty(propName);
+        String prop = applicationContext.getEnvironment().getProperty(propName);
+        if (prop == null) {
+            throw new ServiceLocateException("Property is not found: " + propName);
+        } else {
+            return prop;
+        }
     }
 
     @Override
     public Resource getResource(URI uri) throws ServiceLocateException {
-        if (resourceLoaders.containsKey(uri.getScheme())) {
-            return resourceLoaders.get(uri.getScheme()).load(uri);
+        try {
+            return resourceLoader.load(uri);
+
+        } catch (ResourceException e) {
+            throw new ServiceLocateException(e);
         }
-        return defaultResourceLoader.load(uri);
     }
 }

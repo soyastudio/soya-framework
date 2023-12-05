@@ -1,26 +1,21 @@
 package soya.framework.springboot.starter;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import soya.framework.commons.io.Resource;
 import soya.framework.context.Container;
-import soya.framework.context.ServiceLocateException;
 import soya.framework.context.ServiceLocator;
 import soya.framework.context.ServiceLocatorSingleton;
 
 import javax.annotation.PostConstruct;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration

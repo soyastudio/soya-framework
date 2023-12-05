@@ -6,7 +6,6 @@ import soya.framework.commons.io.ResourceException;
 import soya.framework.commons.io.ResourceLoader;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;

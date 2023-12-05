@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.Map;
 
 public abstract class ServiceLocatorSingleton implements ServiceLocator {
+
     private static ServiceLocatorSingleton me;
     private ServiceLocator locator;
 
@@ -23,6 +24,7 @@ public abstract class ServiceLocatorSingleton implements ServiceLocator {
         if (me == null) {
             throw new IllegalStateException("ServiceLocator is not created.");
         }
+
         return me;
     }
 

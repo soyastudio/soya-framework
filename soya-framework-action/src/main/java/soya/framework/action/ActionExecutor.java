@@ -34,7 +34,7 @@ public final class ActionExecutor<T> {
         return actionName;
     }
 
-    public void set(String name, String value) {
+    public void set(String name, Object value) {
         if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined of visible: " + name);
         }
