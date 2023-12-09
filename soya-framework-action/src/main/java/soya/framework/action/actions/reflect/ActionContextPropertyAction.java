@@ -11,13 +11,13 @@ import soya.framework.action.ActionPropertyType;
 public class ActionContextPropertyAction extends ActionContextAction {
 
     @ActionPropertyDefinition(
-            propertyType = ActionPropertyType.ATTRIBUTE,
+            propertyType = ActionPropertyType.PARAM,
             required = true
     )
     private String propertyName;
 
     @ActionPropertyDefinition(
-            propertyType = ActionPropertyType.ATTRIBUTE
+            propertyType = ActionPropertyType.PARAM
     )
     private boolean required;
 

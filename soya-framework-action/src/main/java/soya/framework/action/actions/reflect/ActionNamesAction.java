@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 )
 public class ActionNamesAction implements Callable<ActionName[]> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     private String domain;
 
     @Override

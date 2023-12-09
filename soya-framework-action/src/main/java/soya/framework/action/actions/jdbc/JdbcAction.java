@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 public abstract class JdbcAction<T> implements Callable<T> {
 
     @ActionPropertyDefinition(
-            propertyType = ActionPropertyType.ATTRIBUTE
+            propertyType = ActionPropertyType.PARAM
     )
     private String dataSourceName;
 

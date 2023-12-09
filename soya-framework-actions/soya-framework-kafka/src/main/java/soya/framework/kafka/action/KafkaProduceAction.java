@@ -10,16 +10,16 @@ import soya.framework.action.ActionPropertyType;
         name = "produce")
 public class KafkaProduceAction extends KafkaProducerAction<RecordMetadata> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM, required = true)
     protected String topic;
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     protected Integer partition;
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     protected String keySerializer;
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     protected String valueSerializer;
 
     @ActionPropertyDefinition(propertyType = ActionPropertyType.INPUT,

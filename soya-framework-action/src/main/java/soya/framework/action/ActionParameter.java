@@ -11,9 +11,14 @@ public final class ActionParameter {
         this.property = property;
     }
 
+    public ActionProperty getProperty() {
+        return property;
+    }
+
     public String getName() {
         return property.getName();
     }
+/*
 
     public Class<?> getType() {
         return property.getType();
@@ -34,6 +39,7 @@ public final class ActionParameter {
     public String getDescription() {
         return property.getDescription();
     }
+*/
 
     public Object get() {
         return value;

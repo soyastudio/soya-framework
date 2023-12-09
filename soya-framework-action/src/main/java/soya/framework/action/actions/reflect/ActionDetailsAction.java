@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 )
 public class ActionDetailsAction implements Callable<String> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE,
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM,
             required = true)
     private String uri;
 

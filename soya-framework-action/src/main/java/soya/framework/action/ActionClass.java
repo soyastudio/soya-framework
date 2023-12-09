@@ -5,6 +5,7 @@ import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -55,6 +56,10 @@ public final class ActionClass {
         return properties;
     }
 
+    public Class<?> getResultType() {
+        return ReflectUtils.findMethod(actionType, "call", new Class<?>[0]).getReturnType();
+    }
+
     static void register(ActionFactory factory) {
         Class<?> type = (Class<?>) ((ParameterizedType) factory.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         factories.put(type, factory);
@@ -97,6 +102,14 @@ public final class ActionClass {
         }
 
         return registrations.get(actionName);
+    }
+
+    public static ActionClass forClass(Class<? extends Callable> clazz) {
+        ActionDefinition annotation = clazz.getAnnotation(ActionDefinition.class);
+        if(annotation == null) {
+            throw new IllegalArgumentException("Class is not annotated as ActionDefinition: " + clazz.getName());
+        }
+        return ActionClass.forName(ActionName.create(annotation.domain(), annotation.name()));
     }
 
     static class DefaultActionFactory implements ActionFactory {
@@ -205,7 +218,7 @@ public final class ActionClass {
         public ActionClass create() {
             Objects.requireNonNull(actionName);
             Objects.requireNonNull(actionType);
-
+            Method method = ReflectUtils.findMethod(actionType, "call", new Class[0]);
             if (registrations.containsKey(actionName)) {
                 throw new IllegalArgumentException("ActionClass already exists: " + actionName);
             }

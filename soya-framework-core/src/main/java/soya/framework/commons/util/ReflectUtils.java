@@ -91,6 +91,7 @@ public class ReflectUtils {
         while (!parent.getName().equals("java.lang.Object")) {
             try {
                 return parent.getDeclaredMethod(methodName, parameterTypes);
+
             } catch (NoSuchMethodException e) {
                 parent = cls.getSuperclass();
             }

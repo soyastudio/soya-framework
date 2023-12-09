@@ -12,7 +12,7 @@ import java.io.File;
 )
 public class ListFilesAction extends DirectoryAction {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     private boolean recursively;
 
     @Override

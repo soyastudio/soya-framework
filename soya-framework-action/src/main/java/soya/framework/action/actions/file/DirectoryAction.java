@@ -7,6 +7,6 @@ import java.io.File;
 
 public abstract class DirectoryAction extends FileUtilAction<File> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM)
     protected String dir;
 }

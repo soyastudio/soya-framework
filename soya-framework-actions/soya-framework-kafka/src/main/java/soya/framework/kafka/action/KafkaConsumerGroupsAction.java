@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
         name = "admin-consumer-groups")
 public class KafkaConsumerGroupsAction extends KafkaAdminAction<Metric[]> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM, required = true)
     private String topicName;
 
     @Override

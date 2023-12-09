@@ -5,7 +5,7 @@ import soya.framework.action.ActionPropertyType;
 
 public abstract class FileAction<T> extends FileUtilAction<T> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE,
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM,
             required = true)
     protected String file;
 }

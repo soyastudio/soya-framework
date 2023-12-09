@@ -11,7 +11,7 @@ import soya.framework.action.ActionPropertyType;
 public class ActionContextResourceAction extends ActionContextAction {
 
     @ActionPropertyDefinition(
-            propertyType = ActionPropertyType.ATTRIBUTE,
+            propertyType = ActionPropertyType.PARAM,
             required = true
     )
     private String uri;

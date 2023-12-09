@@ -10,7 +10,7 @@ public abstract class TextUtilAction implements Callable<String> {
     public static final Charset DEFAULT_ENCODING = Charset.defaultCharset();
 
     @ActionPropertyDefinition(
-            propertyType = ActionPropertyType.ATTRIBUTE
+            propertyType = ActionPropertyType.PARAM
     )
     protected String encoding;
 

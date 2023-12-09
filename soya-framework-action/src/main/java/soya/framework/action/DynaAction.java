@@ -4,11 +4,7 @@ public interface DynaAction {
 
     String[] parameterNames();
 
-    Class<?> parameterType(String paramName);
-
-    ActionPropertyType propertyType(String paramName);
-
-    boolean required(String paramName);
+    ActionProperty getActionProperty(String paramName);
 
     void setParameter(String paramName, Object value);
 

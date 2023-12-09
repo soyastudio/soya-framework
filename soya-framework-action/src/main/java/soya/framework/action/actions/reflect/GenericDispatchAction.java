@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 )
 public class GenericDispatchAction implements Callable<Object> {
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM, required = true)
     private String uri;
 
     @ActionPropertyDefinition(propertyType = ActionPropertyType.INPUT, required = true)

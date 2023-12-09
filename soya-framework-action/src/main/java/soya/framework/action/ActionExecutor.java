@@ -34,12 +34,21 @@ public final class ActionExecutor<T> {
         return actionName;
     }
 
-    public void set(String name, Object value) {
+    public ActionProperty getProperty(String name) {
         if (!parameters.containsKey(name)) {
             throw new IllegalArgumentException("Parameter is not defined of visible: " + name);
         }
 
+        return parameters.get(name).getProperty();
+    }
+
+    public ActionExecutor<T> set(String name, Object value) {
+        if (!parameters.containsKey(name)) {
+            throw new IllegalArgumentException("Parameter is not defined of visible: " + name);
+        }
         parameters.get(name).set(value);
+
+        return this;
     }
 
     public ActionExecutor<T> reset() {
@@ -64,7 +73,7 @@ public final class ActionExecutor<T> {
         Iterator<ActionParameter> iterator = parameters.values().iterator();
         while (iterator.hasNext()) {
             ActionParameter parameter = iterator.next();
-            if (parameter.isRequired() && parameter.get() == null) {
+            if (parameter.getProperty().isRequired() && parameter.get() == null) {
                 throw new IllegalStateException("Property is required: " + parameter.getName());
             }
         }

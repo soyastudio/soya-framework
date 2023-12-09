@@ -16,10 +16,10 @@ import java.util.concurrent.Callable;
 public class ConversionAction implements Callable<Object> {
     private static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM, required = true)
     private String destType;
 
-    @ActionPropertyDefinition(propertyType = ActionPropertyType.ATTRIBUTE, required = true)
+    @ActionPropertyDefinition(propertyType = ActionPropertyType.PARAM, required = true)
     private String valueType;
 
     @ActionPropertyDefinition(propertyType = ActionPropertyType.INPUT, required = true)
