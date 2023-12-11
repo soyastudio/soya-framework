@@ -1,4 +1,4 @@
-package soya.framework.action.orchestration;
+package soya.framework.action.orchestration.annotation;
 
 import soya.framework.commons.util.DefaultUtils;
 

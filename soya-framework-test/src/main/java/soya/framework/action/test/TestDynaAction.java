@@ -1,6 +1,9 @@
 package soya.framework.action.test;
 
-import soya.framework.action.*;
+import soya.framework.action.ActionDefinition;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
+import soya.framework.action.orchestration.AnnotatedDynaAction;
 import soya.framework.action.orchestration.WorkflowAction;
 import soya.framework.action.orchestration.WorkflowBuilder;
 
@@ -13,9 +16,13 @@ import soya.framework.action.orchestration.WorkflowBuilder;
                         referredTo = "classpath:banner.txt")
         }
 )
-public class TestDynaAction extends WorkflowAction<String> {
+public class TestDynaAction extends AnnotatedDynaAction<String> {
+        @Override
+        public String call() throws Exception {
+                return null;
+        }
 
-    @Override
+    /*@Override
     protected WorkflowBuilder builder() {
         return null;
     }
@@ -23,5 +30,5 @@ public class TestDynaAction extends WorkflowAction<String> {
     @Override
     protected void build(WorkflowBuilder builder) {
 
-    }
+    }*/
 }

@@ -80,7 +80,7 @@ public class ReflectUtils {
                 throw new IllegalArgumentException("There are " + methodList.size() + " methods named as '" + methodName + "' for class: " + cls.getName());
             }
 
-            parent = cls.getSuperclass();
+            parent = parent.getSuperclass();
         }
 
         return null;
@@ -93,7 +93,7 @@ public class ReflectUtils {
                 return parent.getDeclaredMethod(methodName, parameterTypes);
 
             } catch (NoSuchMethodException e) {
-                parent = cls.getSuperclass();
+                parent = parent.getSuperclass();
             }
         }
 

@@ -1,4 +1,4 @@
-package soya.framework.action.orchestration;
+package soya.framework.action.orchestration.annotation;
 
 import java.lang.annotation.*;
 
@@ -6,7 +6,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface PipelineDefinition {
-
     TaskDefinition[] tasks();
 
 }

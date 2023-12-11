@@ -1,5 +1,6 @@
 package soya.framework.action.orchestration;
 
+import soya.framework.action.orchestration.annotation.TaskDefinition;
 import soya.framework.commons.conversion.ConvertUtils;
 
 public abstract class AnnotatedDispatchAction<T> extends AnnotatedDynaAction<T> {
@@ -9,7 +10,7 @@ public abstract class AnnotatedDispatchAction<T> extends AnnotatedDynaAction<T> 
     public AnnotatedDispatchAction() {
         super();
 
-        DispatchDefinition dispatch = getClass().getAnnotation(DispatchDefinition.class);
+        TaskDefinition dispatch = getClass().getAnnotation(TaskDefinition.class);
         if (dispatch == null) {
             throw new IllegalArgumentException("Dispatch annotation is required.");
         } else {
@@ -19,7 +20,7 @@ public abstract class AnnotatedDispatchAction<T> extends AnnotatedDynaAction<T> 
 
     @Override
     public T call() throws Exception {
-        Object result = dispatcher.dispatch(new DefaultSession(actionName, parameters), getActionContext());
+        Object result = dispatcher.dispatch(new DefaultSession(actionName, parameters));
         return (T) ConvertUtils.convert(result, getReturnType());
     }
 

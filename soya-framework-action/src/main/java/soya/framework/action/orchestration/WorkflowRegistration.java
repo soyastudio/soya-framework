@@ -23,6 +23,10 @@ public final class WorkflowRegistration {
         }
     }
 
+    public boolean contains(ActionName actionName) {
+        return registration.containsKey(actionName);
+    }
+
     public Workflow get(ActionName actionName) {
         return registration.get(actionName);
     }

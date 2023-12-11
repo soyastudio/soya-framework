@@ -64,7 +64,6 @@
             <version>${project.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>soya.framework</groupId>
             <artifactId>soya-framework-starter-action</artifactId>
@@ -110,6 +109,18 @@
         <dependency>
             <groupId>soya.framework</groupId>
             <artifactId>soya-framework-quartz</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-camel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>soya.framework</groupId>
+            <artifactId>soya-framework-test</artifactId>
             <version>${project.version}</version>
         </dependency>
 

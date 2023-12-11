@@ -1,9 +1,11 @@
 package soya.framework.action.orchestration;
 
 import soya.framework.action.*;
+import soya.framework.action.orchestration.annotation.TaskDefinition;
 import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
 import soya.framework.commons.util.URIUtils;
+import soya.framework.context.ServiceLocatorSingleton;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -12,7 +14,7 @@ import java.util.Arrays;
 
 public class Dispatchers {
 
-    public static Dispatcher create(DispatchDefinition definition) {
+    public static Dispatcher create(TaskDefinition definition) {
         try {
             URI uri = new URI(definition.uri());
             String schema = uri.getScheme();
@@ -20,7 +22,7 @@ public class Dispatchers {
 
             ParameterMapping[] parameterMappings = new ParameterMapping[definition.parameterMappings().length];
             for (int i = 0; i < parameterMappings.length; i++) {
-                soya.framework.action.orchestration.ParameterMapping annotation = definition.parameterMappings()[i];
+                soya.framework.action.orchestration.annotation.ParameterMapping annotation = definition.parameterMappings()[i];
                 parameterMappings[i] = new ParameterMapping(annotation.name(), annotation.type(), annotation.mappingTo());
             }
 
@@ -70,7 +72,8 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session, ActionContext actionContext) throws Exception {
+        public Object dispatch(Session session) throws Exception {
+            ActionContext actionContext = ServiceLocatorSingleton.getInstance().getService(ActionContext.class);
             ActionExecutor executor = (ActionExecutor) ActionClass.forName(actionName).executor(actionContext);
             Arrays.stream(parameterMappings).forEach(e -> {
                 String mappingTo = e.mappingTo;
@@ -123,9 +126,9 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session, ActionContext actionContext) throws Exception {
+        public Object dispatch(Session session) throws Exception {
             Object service = null;
-
+            ActionContext actionContext = ServiceLocatorSingleton.getInstance().getService(ActionContext.class);
             try {
                 service = actionContext.getService(bean);
 
@@ -184,7 +187,7 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session, ActionContext actionContext) throws Exception {
+        public Object dispatch(Session session) throws Exception {
             Object[] values = new Object[paramMappings.length];
             for (int i = 0; i < values.length; i++) {
                 values[i] = session.getParameter(paramMappings[i]);

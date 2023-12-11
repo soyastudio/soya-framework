@@ -1,26 +1,35 @@
 package soya.framework.action.orchestration;
 
-public abstract class WorkflowAction<T> extends AnnotatedDynaAction<T> {
+import soya.framework.action.ActionName;
+import soya.framework.commons.conversion.ConvertUtils;
 
-    private Workflow flow;
+public abstract class WorkflowAction<T> extends AnnotatedDynaAction<T> {
+    protected Workflow flow;
 
     public WorkflowAction() {
         super();
-        WorkflowRegistration registration = WorkflowRegistration.getInstance();
-        this.flow = registration.get(actionName);
-        if(flow == null) {
-            WorkflowBuilder builder = builder();
-            build(builder);
-            registration.register(actionName, builder.create());
-            this.flow = registration.get(actionName);
-        }
-
+        this.flow = fetchOrCreate(actionName);
     }
 
     @Override
-    public final T call() throws Exception {
+    public T call() throws Exception {
         Session session = new DefaultSession(actionName, parameters);
-        return (T) flow.execute(session);
+        Object result = flow.execute(session);
+        return (T) ConvertUtils.convert(result, getReturnType());
+    }
+
+    protected Workflow fetchOrCreate(ActionName actionName) {
+        WorkflowRegistration registration = WorkflowRegistration.getInstance();
+        Workflow workflow = registration.get(actionName);
+        if(workflow == null) {
+            WorkflowBuilder builder = builder();
+            build(builder);
+            workflow = builder.create();
+            registration.register(actionName, workflow);
+        }
+
+        return workflow;
+
     }
 
     protected abstract WorkflowBuilder builder();

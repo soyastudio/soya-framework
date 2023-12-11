@@ -1,12 +1,12 @@
 package soya.framework.action.orchestration;
 
+import soya.framework.action.orchestration.annotation.PipelineDefinition;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class AnnotatedPipelineAction <T> extends AnnotatedDynaAction<T> {
-
-    protected Map<String, Task> tasks = new LinkedHashMap<>();
 
     public AnnotatedPipelineAction() {
         super();
