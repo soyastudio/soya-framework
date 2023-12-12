@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public class Dispatchers {
 
-    public static Dispatcher create(TaskDefinition definition) {
+    public static Processor create(TaskDefinition definition) {
         try {
             URI uri = new URI(definition.uri());
             String schema = uri.getScheme();
@@ -27,13 +27,13 @@ public class Dispatchers {
             }
 
             if (schema.equals("action")) {
-                return new ActionDispatcher(uri.getSchemeSpecificPart(), parameterMappings);
+                return new ActionProcessor(uri.getSchemeSpecificPart(), parameterMappings);
 
             } else if (schema.equals("bean")) {
-                return new BeanMethodDispatcher(details, parameterMappings);
+                return new BeanMethodProcessor(details, parameterMappings);
 
             } else if (schema.equals("class")) {
-                return new StaticMethodDispatcher(details, parameterMappings);
+                return new StaticMethodProcessor(details, parameterMappings);
 
             } else {
                 throw new IllegalArgumentException("");
@@ -57,11 +57,11 @@ public class Dispatchers {
         }
     }
 
-    static class ActionDispatcher implements Dispatcher {
+    static class ActionProcessor implements Processor {
         private final ActionName actionName;
         private final ParameterMapping[] parameterMappings;
 
-        ActionDispatcher(String uri, ParameterMapping[] parameterMappings) {
+        ActionProcessor(String uri, ParameterMapping[] parameterMappings) {
             try {
                 this.actionName = ActionName.fromURI(new URI(uri));
                 this.parameterMappings = parameterMappings;
@@ -72,7 +72,7 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session) throws Exception {
+        public Object process(Session session) throws Exception {
             ActionContext actionContext = ServiceLocatorSingleton.getInstance().getService(ActionContext.class);
             ActionExecutor executor = (ActionExecutor) ActionClass.forName(actionName).executor(actionContext);
             Arrays.stream(parameterMappings).forEach(e -> {
@@ -91,7 +91,7 @@ public class Dispatchers {
         }
     }
 
-    static class BeanMethodDispatcher implements Dispatcher {
+    static class BeanMethodProcessor implements Processor {
 
         private String bean;
         private String methodName;
@@ -99,7 +99,7 @@ public class Dispatchers {
         private Class<?>[] paramTypes;
         private String[] paramMappings;
 
-        BeanMethodDispatcher(String details, ParameterMapping[] parameterMappings) {
+        BeanMethodProcessor(String details, ParameterMapping[] parameterMappings) {
             paramTypes = new Class[parameterMappings.length];
             paramMappings = new String[parameterMappings.length];
             for (int i = 0; i < parameterMappings.length; i++) {
@@ -126,7 +126,7 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session) throws Exception {
+        public Object process(Session session) throws Exception {
             Object service = null;
             ActionContext actionContext = ServiceLocatorSingleton.getInstance().getService(ActionContext.class);
             try {
@@ -148,11 +148,11 @@ public class Dispatchers {
         }
     }
 
-    static class StaticMethodDispatcher implements Dispatcher {
+    static class StaticMethodProcessor implements Processor {
         private Method method;
         private String[] paramMappings;
 
-        StaticMethodDispatcher(String details, ParameterMapping[] parameterMappings) {
+        StaticMethodProcessor(String details, ParameterMapping[] parameterMappings) {
             Class<?>[] paramTypes = new Class[parameterMappings.length];
             paramMappings = new String[parameterMappings.length];
             for (int i = 0; i < parameterMappings.length; i++) {
@@ -187,7 +187,7 @@ public class Dispatchers {
         }
 
         @Override
-        public Object dispatch(Session session) throws Exception {
+        public Object process(Session session) throws Exception {
             Object[] values = new Object[paramMappings.length];
             for (int i = 0; i < values.length; i++) {
                 values[i] = session.getParameter(paramMappings[i]);

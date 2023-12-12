@@ -3,29 +3,36 @@ package soya.framework.action.test;
 import soya.framework.action.ActionDefinition;
 import soya.framework.action.ActionPropertyDefinition;
 import soya.framework.action.ActionPropertyType;
-import soya.framework.action.orchestration.PipelineAction;
-import soya.framework.action.orchestration.PipelineBuilder;
-import soya.framework.action.orchestration.Task;
+import soya.framework.action.orchestration.AnnotatedPipelineAction;
+import soya.framework.action.orchestration.annotation.ParameterMapping;
+import soya.framework.action.orchestration.annotation.PipelineDefinition;
+import soya.framework.action.orchestration.annotation.TaskDefinition;
 
 @ActionDefinition(
         domain = "test",
         name = "pipelineActionTest",
         properties = {
-                @ActionPropertyDefinition(name = "value",
-                        propertyType = ActionPropertyType.WIRED_RESOURCE,
-                        referredTo = "classpath:banner.txt")
+                @ActionPropertyDefinition(
+                        name = "message",
+                        propertyType = ActionPropertyType.INPUT)
         }
 )
-public class TestPipelineAction extends PipelineAction<String> {
-
-    public TestPipelineAction() {
-        super();
-    }
-
-    @Override
-    protected void build(PipelineBuilder builder) {
-        builder.addTask(Task.builder().name("A"))
-                .addTask(Task.builder().name("B"));
-
-    }
+@PipelineDefinition(
+        tasks = {
+                @TaskDefinition(
+                        name = "encoded",
+                        uri = "text-utils://base64encode?text=message"
+                ),
+                @TaskDefinition(
+                        uri = "text-utils://base64decode",
+                        parameterMappings = {
+                                @ParameterMapping(
+                                        name = "text",
+                                        mappingTo = "{encoded}"
+                                )
+                        }
+                )
+        }
+)
+public class TestPipelineAction extends AnnotatedPipelineAction<String> {
 }

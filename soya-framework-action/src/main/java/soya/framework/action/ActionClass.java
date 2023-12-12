@@ -3,6 +3,7 @@ package soya.framework.action;
 import soya.framework.commons.conversion.ConvertUtils;
 import soya.framework.commons.util.DefaultUtils;
 import soya.framework.commons.util.ReflectUtils;
+import soya.framework.context.ServiceLocatorSingleton;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -84,6 +85,11 @@ public final class ActionClass {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public ActionExecutor<?> executor() {
+        ActionContext actionContext = ServiceLocatorSingleton.getInstance().getService(ActionContext.class);
+        return new ActionExecutor(name, creators.get(name).create(name, actionContext), interactiveProperties);
     }
 
     public ActionExecutor<?> executor(ActionContext actionContext) {

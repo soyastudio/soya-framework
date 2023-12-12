@@ -64,7 +64,7 @@
 
         <dependency>
             <groupId>soya.framework</groupId>
-            <artifactId>soya-framework-action-restadapter</artifactId>
+            <artifactId>soya-framework-restruts-action</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -69,7 +69,7 @@ class DefaultSession implements Session {
             return attributes.get(str);
 
         } else {
-            return parameters.get(exp);
+            return parameters.get(exp).get();
 
         }
     }

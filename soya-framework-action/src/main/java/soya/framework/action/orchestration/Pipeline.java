@@ -1,26 +1,30 @@
 package soya.framework.action.orchestration;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Pipeline implements Workflow {
-    private List<Task> tasks = new ArrayList<>();
+    private final List<Task> tasks;
 
     public Pipeline(List<Task> tasks) {
-        this.tasks = tasks;
+        this.tasks = Collections.unmodifiableList(tasks);
     }
 
     @Override
     public Object execute(Session session) throws Exception {
         Queue<Task> taskQueue = new LinkedBlockingQueue<>(tasks);
-        boolean process = true;
-        while (process && !taskQueue.isEmpty()) {
+        Object result = null;
+        while (!taskQueue.isEmpty()) {
             Task task = taskQueue.poll();
-            process = task.process(session);
+            result = new TaskProcessor(task).process(session);
+            if (task.getName() != null && !task.getName().isEmpty()) {
+                session.set(task.getName(), result);
+            }
         }
-        return "Hello Pipeline";
+
+        return result;
     }
 
 }

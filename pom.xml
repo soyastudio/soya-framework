@@ -272,7 +272,7 @@
         <module>soya-framework-camel</module>
         <module>soya-framework-test</module>
         <module>soya-framework-restruts</module>
-        <module>soya-framework-action-restadapter</module>
+        <module>soya-framework-restruts-action</module>
         <module>soya-framework-starter</module>
         <module>soya-framework-starter-action</module>
         <module>soya-framework-starter-restruts</module>

@@ -5,7 +5,7 @@ import soya.framework.commons.conversion.ConvertUtils;
 
 public abstract class AnnotatedDispatchAction<T> extends AnnotatedDynaAction<T> {
 
-    private Dispatcher dispatcher;
+    private Processor dispatcher;
 
     public AnnotatedDispatchAction() {
         super();
@@ -20,7 +20,7 @@ public abstract class AnnotatedDispatchAction<T> extends AnnotatedDynaAction<T> 
 
     @Override
     public T call() throws Exception {
-        Object result = dispatcher.dispatch(new DefaultSession(actionName, parameters));
+        Object result = dispatcher.process(new DefaultSession(actionName, parameters));
         return (T) ConvertUtils.convert(result, getReturnType());
     }
 
