@@ -1,19 +1,23 @@
 package soya.framework.action.orchestration;
 
+import soya.framework.action.ActionClass;
 import soya.framework.action.orchestration.annotation.TaskDefinition;
 import soya.framework.commons.util.URIUtils;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public final class Task implements Serializable {
     private final String name;
-    private final String uri;
+    private final URI uri;
     private final ParameterMapping[] parameterMappings;
 
-    private Task(String name, String uri, ParameterMapping[] parameterMappings) {
+    private Task(String name, URI uri, ParameterMapping[] parameterMappings) {
         this.name = name;
         this.uri = uri;
         this.parameterMappings = parameterMappings;
@@ -23,7 +27,7 @@ public final class Task implements Serializable {
         return name;
     }
 
-    public String getUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -45,9 +49,15 @@ public final class Task implements Serializable {
         return builder;
     }
 
+    public static Builder builder(Class<? extends Callable> actionType) {
+        Builder builder = new Builder();
+        builder.uri = ActionClass.forClass(actionType).getName().toURI();
+        return builder;
+    }
+
     public static class Builder {
         private String name;
-        private String uri;
+        private URI uri;
 
         private List<ParameterMapping> parameterMappings = new ArrayList<>();
 
@@ -60,18 +70,22 @@ public final class Task implements Serializable {
         }
 
         public Builder uri(String uri) {
-            if(!uri.contains("?")) {
-                this.uri = uri;
-            } else {
-                int index = uri.indexOf('?');
-                this.uri = uri.substring(0, index);
-                String queryString = uri.substring(index + 1);
-                URIUtils.splitQuery(queryString).entrySet().forEach(e -> {
-                    parameterMappings.add(new ParameterMapping(e.getKey(), e.getValue().get(0)));
-                });
+            try {
+                if(!uri.contains("?")) {
+                    this.uri = new URI(uri);
+                } else {
+                    int index = uri.indexOf('?');
+                    this.uri = new URI(uri.substring(0, index));
+                    String queryString = uri.substring(index + 1);
+                    URIUtils.splitQuery(queryString).entrySet().forEach(e -> {
+                        parameterMappings.add(new ParameterMapping(e.getKey(), e.getValue().get(0)));
+                    });
+                }
+                return this;
 
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(e);
             }
-            return this;
         }
 
         public Task create() {

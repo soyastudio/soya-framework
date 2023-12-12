@@ -6,21 +6,24 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Pipeline implements Workflow {
-    private final List<Task> tasks;
+    private final List<Processor> tasks;
 
-    public Pipeline(List<Task> tasks) {
+    public Pipeline(List<Processor> tasks) {
         this.tasks = Collections.unmodifiableList(tasks);
     }
 
     @Override
     public Object execute(Session session) throws Exception {
-        Queue<Task> taskQueue = new LinkedBlockingQueue<>(tasks);
+        Queue<Processor> taskQueue = new LinkedBlockingQueue<>(tasks);
         Object result = null;
         while (!taskQueue.isEmpty()) {
-            Task task = taskQueue.poll();
-            result = new TaskProcessor(task).process(session);
-            if (task.getName() != null && !task.getName().isEmpty()) {
-                session.set(task.getName(), result);
+            Processor processor = taskQueue.poll();
+            result = processor.process(session);
+            if(processor instanceof NamedProcessor) {
+                NamedProcessor namedProcessor = (NamedProcessor) processor;
+                if(namedProcessor.getName() != null && !namedProcessor.getName().isEmpty()) {
+                    session.set(namedProcessor.getName(), result);
+                }
             }
         }
 

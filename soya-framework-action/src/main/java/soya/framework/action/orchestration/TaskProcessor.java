@@ -4,10 +4,9 @@ import soya.framework.action.ActionClass;
 import soya.framework.action.ActionExecutor;
 import soya.framework.action.ActionName;
 
-import java.net.URI;
 import java.util.Arrays;
 
-public final class TaskProcessor implements Processor {
+public final class TaskProcessor implements NamedProcessor {
     private Task task;
 
     public TaskProcessor(Task task) {
@@ -15,8 +14,13 @@ public final class TaskProcessor implements Processor {
     }
 
     @Override
+    public String getName() {
+        return task.getName();
+    }
+
+    @Override
     public Object process(Session session) throws Exception {
-        ActionName actionName = ActionName.fromURI(new URI(task.getUri()));
+        ActionName actionName = ActionName.fromURI(task.getUri());
         ActionExecutor executor = ActionClass.forName(actionName).executor();
         Arrays.stream(task.getParameterMappings()).forEach(e -> {
             executor.set(e.getName(), session.evaluate(e.getMappingTo()));
