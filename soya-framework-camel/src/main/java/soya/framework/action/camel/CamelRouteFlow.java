@@ -18,6 +18,7 @@ public class CamelRouteFlow implements Workflow {
         DirectEndpoint directEndpoint = new DirectEndpoint(session.getActionName().toString(), new DirectComponent());
 
         CamelContext context = ServiceLocatorSingleton.getInstance().getService(CamelContext.class);
+
         DefaultProducerTemplate template = new DefaultProducerTemplate(context, directEndpoint);
         template.start();
         Exchange exchange = new DefaultExchange(context);
