@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 public final class Task implements Serializable {
+
     private final String name;
     private final URI uri;
     private final ParameterMapping[] parameterMappings;

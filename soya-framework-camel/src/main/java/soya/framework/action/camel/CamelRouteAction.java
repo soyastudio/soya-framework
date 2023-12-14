@@ -4,6 +4,7 @@ import soya.framework.action.orchestration.WorkflowAction;
 import soya.framework.action.orchestration.WorkflowBuilder;
 
 public abstract class CamelRouteAction<T> extends WorkflowAction<T> {
+
     public CamelRouteAction() {
         super();
     }
@@ -19,4 +20,6 @@ public abstract class CamelRouteAction<T> extends WorkflowAction<T> {
     }
 
     protected abstract void build(CamelRouteFlowBuilder builder);
+
+
 }

@@ -3,6 +3,8 @@ package soya.framework.azure.blob.action;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
+import soya.framework.action.ActionPropertyDefinition;
+import soya.framework.action.ActionPropertyType;
 import soya.framework.context.ServiceLocatorSingleton;
 
 import java.io.ByteArrayOutputStream;

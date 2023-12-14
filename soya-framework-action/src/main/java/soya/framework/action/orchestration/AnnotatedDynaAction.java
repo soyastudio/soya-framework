@@ -10,6 +10,7 @@ import soya.framework.commons.util.ReflectUtils;
 import java.util.Arrays;
 
 public abstract class AnnotatedDynaAction<T> extends DynaActionBase<T> {
+
     protected ActionName actionName;
 
     public AnnotatedDynaAction() {
