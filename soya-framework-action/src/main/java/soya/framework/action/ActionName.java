@@ -23,6 +23,15 @@ public final class ActionName implements Comparable<ActionName>, Serializable {
         }
     }
 
+    public static ActionName fromURI(String uri) {
+        try {
+            return fromURI(new URI(uri));
+
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
     public static ActionName fromURI(URI uri) {
         return new ActionName(uri.getScheme(), uri.getHost());
     }
@@ -68,7 +77,7 @@ public final class ActionName implements Comparable<ActionName>, Serializable {
     @Override
     public int compareTo(ActionName o) {
         int result = domain.compareTo(o.domain);
-        if(result == 0) {
+        if (result == 0) {
             result = name.compareTo(o.name);
         }
         return result;
