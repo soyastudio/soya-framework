@@ -16,3 +16,7 @@
 
 
 ## DSL
+```
+<activity> from <src> as <n> to <dest> 
+
+```
