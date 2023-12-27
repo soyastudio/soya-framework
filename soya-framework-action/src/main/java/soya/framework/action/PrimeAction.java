@@ -1,6 +1,5 @@
 package soya.framework.action;
 
-
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE})

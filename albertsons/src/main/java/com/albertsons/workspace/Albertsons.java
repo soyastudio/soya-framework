@@ -4,7 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import soya.framework.commons.util.DefaultUtils;
 
 import java.io.File;
 import java.net.URI;
@@ -22,11 +21,11 @@ public class Albertsons {
 
     private static void init() {
         String url = Albertsons.class.getProtectionDomain().getCodeSource().getLocation().toString();
-        if(url.indexOf("!") > 0) {
+        if (url.indexOf("!") > 0) {
             url = url.substring(0, url.indexOf("!"));
         }
 
-        if(url.startsWith("jar:")) {
+        if (url.startsWith("jar:")) {
             url = url.substring("jar:".length());
         }
 
