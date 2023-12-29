@@ -8,7 +8,7 @@ public class ActionSyntaxTree {
 
     private ActionPhrase activity;
     private List<ActionPhrase> prepositionalPhrases = new ArrayList<>();
-    private String complements;
+    private List<ActionPhrase> complements = new ArrayList<>();
 
     public static ActionSyntaxTree parse(String exp) throws SyntaxException {
         ActionSyntaxTreeBuilder builder = new ActionSyntaxTreeBuilder();
@@ -18,6 +18,18 @@ public class ActionSyntaxTree {
         }
 
         return builder.create();
+    }
+
+    void addPhrase(ActionPhrase phrase) {
+        if (Dictionary.isActivity(phrase.getKeyword())) {
+            activity = phrase;
+
+        } else if (Dictionary.isKeyword(phrase.getKeyword())){
+            prepositionalPhrases.add(phrase);
+
+        } else {
+            complements.add(phrase);
+        }
     }
 
     static class ActionSyntaxTreeBuilder {
@@ -33,14 +45,17 @@ public class ActionSyntaxTree {
             String keyword = Dictionary.getKeyword(word);
             if (keyword != null) {
                 if (phrase != null) {
-                    if (Dictionary.isActivity(phrase.getKeyword())) {
-                        tree.activity = phrase;
-                    } else {
-                        tree.prepositionalPhrases.add(phrase);
-                    }
+                    tree.addPhrase(phrase);
                 }
 
                 this.phrase = new ActionPhrase(keyword);
+
+            } else if (Dictionary.isProposition(word)) {
+                if (phrase != null) {
+                    tree.addPhrase(phrase);
+                }
+
+                this.phrase = new ActionPhrase(word.toUpperCase());
 
             } else {
                 if (phrase != null) {
@@ -57,11 +72,7 @@ public class ActionSyntaxTree {
 
         ActionSyntaxTree create() {
             if (phrase != null) {
-                if (Dictionary.isActivity(phrase.getKeyword())) {
-                    tree.activity = phrase;
-                } else {
-                    tree.prepositionalPhrases.add(phrase);
-                }
+                tree.addPhrase(phrase);
             } else {
                 throw new IllegalStateException("");
             }

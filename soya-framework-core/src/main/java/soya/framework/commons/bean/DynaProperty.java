@@ -5,7 +5,7 @@ import java.io.Serializable;
 public final class DynaProperty extends AnnotatableFeature implements Serializable {
 
     private final String name;
-    private transient Class<?> type;
+    private final transient Class<?> type;
 
     public DynaProperty(final String name, final Class<?> type) {
         super();

@@ -1,5 +1,7 @@
 package soya.framework.action.dsl;
 
+import soya.framework.action.ActionClass;
+
 import java.util.*;
 
 public final class Dictionary {
@@ -61,10 +63,15 @@ public final class Dictionary {
             "without"
     };
 
+    private static Set<String> prepositions = new HashSet<>();
     private static Set<String> keywords = new LinkedHashSet<>();
     private static Map<String, String> synonyms = new HashMap<>();
 
     static {
+        Arrays.stream(PREPOSITIONS).forEach(e -> {
+            prepositions.add(e.toUpperCase());
+        });
+
         Arrays.stream(Activity.values()).forEach(e -> {
             keywords.add(e.name());
         });
@@ -73,7 +80,9 @@ public final class Dictionary {
             keywords.add(e.name());
         });
 
-
+        Arrays.stream(ActionClass.actionNames()).forEach(e -> {
+            System.out.println("========================= " + e);
+        });
     }
 
     public static String[] getKeywords() {
@@ -89,8 +98,12 @@ public final class Dictionary {
             return synonyms.get(w);
 
         } else {
-            throw new IllegalArgumentException("Cannot find keywords for '" + word + "'.");
+            return null;
         }
+    }
+
+    public static boolean isProposition(String word) {
+        return prepositions.contains(word.toUpperCase());
     }
 
     public static boolean isActivity(String kw) {
@@ -100,6 +113,10 @@ public final class Dictionary {
         } catch (IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public static boolean isKeyword(String word) {
+        return keywords.contains(word);
     }
 
     enum Activity {
@@ -113,11 +130,11 @@ public final class Dictionary {
     }
 
     enum Preposition {
-        AS,
-        FOR,
-        FROM,
-        ON,
-        THROUGH,
-        TO
+        WITHIN,     // within specific domain
+        FROM,       // from source
+        TO,         // to destination
+        AS,         // as temp name
+        FOR,        // for specific type
+        ON         // on event
     }
 }

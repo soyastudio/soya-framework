@@ -1,4 +1,4 @@
-package soya.framework.action.dsl.actions;
+package soya.framework.action.actions;
 
 import soya.framework.action.ActionDefinition;
 import soya.framework.action.ActionPropertyDefinition;
