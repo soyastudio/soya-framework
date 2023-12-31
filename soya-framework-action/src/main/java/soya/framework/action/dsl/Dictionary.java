@@ -63,6 +63,7 @@ public final class Dictionary {
             "without"
     };
 
+    private static Set<String> domains = new LinkedHashSet<>();
     private static Set<String> prepositions = new HashSet<>();
     private static Set<String> keywords = new LinkedHashSet<>();
     private static Map<String, String> synonyms = new HashMap<>();
@@ -81,7 +82,11 @@ public final class Dictionary {
         });
 
         Arrays.stream(ActionClass.actionNames()).forEach(e -> {
-            System.out.println("========================= " + e);
+            domains.add(e.getDomain());
+            Class<?> cls = ActionClass.forName(e).getActionType();
+            if(cls.getAnnotation(ActionMatching.class) != null) {
+
+            }
         });
     }
 
@@ -131,6 +136,8 @@ public final class Dictionary {
 
     enum Preposition {
         WITHIN,     // within specific domain
+        IN,         // same as WITHIN
+        UNDER,      // same as WITHIN
         FROM,       // from source
         TO,         // to destination
         AS,         // as temp name

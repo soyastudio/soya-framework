@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 
 public class ActionSyntaxTree {
 
+    private ActionPhrase domain;
     private ActionPhrase activity;
     private List<ActionPhrase> prepositionalPhrases = new ArrayList<>();
     private List<ActionPhrase> complements = new ArrayList<>();
@@ -21,10 +22,16 @@ public class ActionSyntaxTree {
     }
 
     void addPhrase(ActionPhrase phrase) {
-        if (Dictionary.isActivity(phrase.getKeyword())) {
+        String keyword = phrase.getKeyword();
+        if ("WITHIN".equalsIgnoreCase(keyword)
+                || "IN".equalsIgnoreCase(keyword)
+                || "UNDER".equalsIgnoreCase(keyword)) {
+            domain = phrase;
+
+        } else if (Dictionary.isActivity(phrase.getKeyword())) {
             activity = phrase;
 
-        } else if (Dictionary.isKeyword(phrase.getKeyword())){
+        } else if (Dictionary.isKeyword(phrase.getKeyword())) {
             prepositionalPhrases.add(phrase);
 
         } else {
